@@ -1,5 +1,11 @@
-import Image from "next/image";
-
+import Image from 'next/image';
+import { Button, Toggle } from '@/components';
 export default function Home() {
-  return <h1>Hello</h1>;
+  return (
+    <div>
+      <h1>Hello</h1>
+      <Button />
+      <Toggle />
+    </div>
+  );
 }
