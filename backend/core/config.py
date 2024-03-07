@@ -12,6 +12,7 @@ class Settings:
     PROJECT_VERSION: str = "1.0.0"
 
     DATABASE_URL = os.getenv("SUPABASE_URL")
+    TMDB_BEARER = os.getenv("TMDB_BEARER")
 
 
 settings = Settings()
