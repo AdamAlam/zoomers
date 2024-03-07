@@ -65,7 +65,7 @@ async def get_popular_movies(page: Optional[str] = 1):
 
 @app.get("/tvShows/popular/")
 async def get_popular_shows(page: Optional[str] = 1):
-    url = "https://api.themoviedb.org/3/tv/popular?language=en-US&page={page}"
+    url = f"https://api.themoviedb.org/3/tv/popular?language=en-US&page={page}"
 
     headers = {
         "accept": "application/json",
