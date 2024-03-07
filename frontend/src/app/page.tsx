@@ -1,5 +1,13 @@
-import Image from "next/image";
+"use client";
+import Navbar from "@/components/Navbar";
+import SplashImage from "@/components/SplashImage";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  return <h1>Hello</h1>;
+  return (
+    <div className="flex flex-col container">
+      <Navbar />
+      <SplashImage />
+    </div>
+  );
 }
