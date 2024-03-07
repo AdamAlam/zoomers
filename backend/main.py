@@ -34,3 +34,16 @@ async def get_movie_detail(movie_id):
     response = requests.get(url, headers=headers)
 
     return response.json()
+
+
+@app.get("/tvShow/{show_id}")
+async def get_show_detail(show_id):
+    url = f"https://api.themoviedb.org/3/tv/{show_id}?language=en-US"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {settings.TMDB_BEARER}",
+    }
+
+    response = requests.get(url, headers=headers)
+
+    return response.json()
