@@ -1,9 +1,10 @@
-from fastapi import FastAPI
-from core.config import settings
-from db.session import engine
-from db.base_class import Base
-import requests
 from typing import Optional
+
+import requests
+from core.config import settings
+from db.base_class import Base
+from db.session import engine
+from fastapi import FastAPI
 
 
 def create_tables():
