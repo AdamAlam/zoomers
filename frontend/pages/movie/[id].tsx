@@ -20,29 +20,18 @@ const MovieDetail = () => {
   }, [movieId]);
 
   return movieDetails ? (
-    <div className="flex h-screen w-screen flex-col bg-slate-400">
-      <div
-        className="absolute inset-0 mt-20 flex h-2/6 w-full items-center justify-center border-2 border-sky-950"
-        style={{
-          backgroundImage: `url(${imageUrl}${movieDetails?.backdrop_path})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        <div>
-          <Image
-            src={`${imageUrl}${movieDetails?.poster_path}`}
-            width={200}
-            height={300}
-            className="border-radius-2"
-            alt={movieDetails?.title}
-          />
-        </div>
-        <div className="text-white">
-          <p className="text-3xl">{movieDetails?.title}</p>
-        </div>
-      </div>
+    <div>
+      <h1>{movieDetails.title}</h1>
+      <Image
+        src={`${imageUrl}${movieDetails.poster_path}`}
+        alt={movieDetails.title}
+        width={200}
+        height={300}
+      />
+      <p>{movieDetails.overview}</p>
     </div>
-  ) : null;
+  ) : (
+    <div>Loading...</div>
+  );
 };
 export default MovieDetail;
