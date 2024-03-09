@@ -19,7 +19,7 @@ const MovieDetail = () => {
     }
   }, [movieId]);
 
-  return (
+  return movieDetails ? (
     <div className="flex h-screen w-screen flex-col bg-slate-400">
       <div
         className="absolute inset-0 mt-20 flex h-2/6 w-full items-center justify-center border-2 border-sky-950"
@@ -35,6 +35,7 @@ const MovieDetail = () => {
             width={200}
             height={300}
             className="border-radius-2"
+            alt={movieDetails?.title}
           />
         </div>
         <div className="text-white">
@@ -42,6 +43,6 @@ const MovieDetail = () => {
         </div>
       </div>
     </div>
-  );
+  ) : null;
 };
 export default MovieDetail;
