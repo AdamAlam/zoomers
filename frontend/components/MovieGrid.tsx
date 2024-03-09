@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import {Movie} from '../movie.types';
+import { Movie } from '../movie.types';
 import Link from 'next/link';
 
 interface Props {
@@ -20,10 +20,10 @@ const MovieGrid = ({ movies }: Props) => {
           <Link href={`/movie/${movie.id}`} key={movie.id}>
             <Image
               src={`${imageBaseUrl}${movie.poster_path}`}
-              className="mr-2 transform object-contain transition-transform hover:scale-110"
+              className="transform object-contain px-2 transition-transform hover:scale-110"
               width={200}
               height={300}
-              alt={movie.title}
+              alt={movie.title} // Add this line
             />
           </Link>
         ))}
