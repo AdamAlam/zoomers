@@ -46,8 +46,8 @@ const MovieDetail = () => {
             />
           </div>
           <div>
-            <h1 className="font font-serif text-3xl">{movieDetails.title}</h1>
-            <p className="text-sm uppercase">{movieDetails.tagline}</p>
+            <h1 className="mb-2 font-serif text-3xl">{movieDetails.title}</h1>
+            <p className="mb-2 text-sm uppercase">{movieDetails.tagline}</p>
             <p>{movieDetails.overview}</p>
           </div>
         </div>
