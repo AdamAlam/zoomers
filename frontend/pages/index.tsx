@@ -11,8 +11,6 @@ export default function Home() {
       .then(data => setMovieList(data.results));
   }, []);
 
-  console.table(movieList);
-
   return (
     <div>
       <MovieGrid movies={movieList} />
