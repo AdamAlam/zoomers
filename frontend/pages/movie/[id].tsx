@@ -1,7 +1,4 @@
-'use client';
-
 import { Movie } from '@/movie.types';
-import { AspectRatio } from '@radix-ui/react-aspect-ratio';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -23,15 +20,21 @@ const MovieDetail = () => {
   return movieDetails ? (
     <div className="mx-auto max-w-screen-lg">
       <div className="flex flex-col items-center justify-center">
-        <div className="mb-4 flex justify-center">
+        <div className="relative mb-4 h-[500px] w-full">
           <Image
             src={`${imageUrl}${movieDetails.backdrop_path}`}
-            width={1024}
-            height={576}
+            layout="fill"
+            objectFit="cover"
             alt="Movie backdrop image"
           />
-        </div>
+          {/* Overlay for bottom fade */}
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
 
+          {/* Overlay for left side fade
+          <div className="absolute bottom-0 left-0 top-0 w-32 bg-gradient-to-r from-white to-transparent" />
+          {/* Overlay for right side fade */}
+          {/* <div className="absolute bottom-0 right-0 top-0 w-32 bg-gradient-to-l from-white to-transparent" /> */}
+        </div>
         <div className="flex w-full justify-start">
           <div className="mr-8 shrink-0">
             <Image
@@ -43,16 +46,16 @@ const MovieDetail = () => {
             />
           </div>
           <div>
-            <h1>{movieDetails.title}</h1>
+            <h1 className="font font-serif text-3xl">{movieDetails.title}</h1>
+            <p className="text-sm uppercase">{movieDetails.tagline}</p>
             <p>{movieDetails.overview}</p>
           </div>
         </div>
-        <div></div>
-        <div></div>
       </div>
     </div>
   ) : (
     <div>Loading...</div>
   );
 };
+
 export default MovieDetail;
