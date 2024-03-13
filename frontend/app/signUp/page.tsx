@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Label } from "./../components/ui/label";
 import { Input } from "./../components/ui/input";
 import { cn } from "../utils/cn";
@@ -11,9 +11,13 @@ import {
 import { supabase } from "../lib/supabase/supabaseClient";
 import { Provider } from "@supabase/supabase-js";
 import { useToast } from "@/components/ui/use-toast";
+import {z} from "zod"
 
 const SignUp = () => {
   const { toast } = useToast();
+
+  const [formData, setFormData] = useState({})
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form submitted");
@@ -25,6 +29,22 @@ const SignUp = () => {
       provider: provider,
     });
   };
+
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  }
+
+  const FormSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+    passwordConfirm: z.string().min(6),
+    firstname: z.string(),
+    lastname: z.string(),
+  }).refine(data => data.password === data.passwordConfirm, {
+    message: "Passwords do not match",
+    path: ["passwordConfirm"],
+  });
 
   return (
     <div className="mx-auto w-full max-w-md rounded-none bg-white p-4 shadow-input dark:bg-black md:rounded-2xl md:p-8">
@@ -39,27 +59,28 @@ const SignUp = () => {
         <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
           <LabelInputContainer>
             <Label htmlFor="firstname">First name</Label>
-            <Input id="firstname" placeholder="Tyler" type="text" />
+            <Input name="firstname" placeholder="Tyler" type="text" onChange={handleFormChange}/>
           </LabelInputContainer>
           <LabelInputContainer>
             <Label htmlFor="lastname">Last name</Label>
-            <Input id="lastname" placeholder="Durden" type="text" />
+            <Input name="lastname" placeholder="Durden" type="text" onChange={handleFormChange}/>
           </LabelInputContainer>
         </div>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>
-          <Input id="email" placeholder="projectmayhem@fc.com" type="email" />
+          <Input name="email" placeholder="projectmayhem@fc.com" type="email" onChange={handleFormChange}/>
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" placeholder="••••••••" type="password" />
+          <Input name="password" placeholder="••••••••" type="password" onChange={handleFormChange}/>
         </LabelInputContainer>
         <LabelInputContainer className="mb-8">
-          <Label htmlFor="twitterpassword">Your twitter password</Label>
+          <Label htmlFor="passwordConfirm">Confirm Password</Label>
           <Input
-            id="twitterpassword"
+            name="passwordConfirm"
             placeholder="••••••••"
-            type="twitterpassword"
+            type="password"
+            onChange={handleFormChange}
           />
         </LabelInputContainer>
 
