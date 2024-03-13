@@ -1,25 +1,28 @@
-'use client';
-import React from 'react';
-import { Label } from './../components/ui/label';
-import { Input } from './../components/ui/input';
-import { cn } from './../components/ui/utils/cn';
+"use client";
+import React from "react";
+import { Label } from "./../components/ui/label";
+import { Input } from "./../components/ui/input";
+import { cn } from "../utils/cn";
 import {
   IconBrandGithub,
   IconBrandGoogle,
-  IconBrandOnlyfans
-} from '@tabler/icons-react';
-import { supabase } from '@/lib/supabase/supabaseClient';
-import { Provider } from '@supabase/supabase-js';
+  IconBrandOnlyfans,
+} from "@tabler/icons-react";
+import { supabase } from "../lib/supabase/supabaseClient";
+import { Provider } from "@supabase/supabase-js";
+import { useToast } from "@/components/ui/use-toast";
 
-const Login = () => {
+const SignUp = () => {
+  const { toast } = useToast();
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Form submitted');
+    console.log("Form submitted");
+    toast({ title: "Form submitted", description: "success" });
   };
 
   const handleOAuthLogin = async (provider: Provider) => {
     await supabase.auth.signInWithOAuth({
-      provider: provider
+      provider: provider,
     });
   };
 
@@ -74,7 +77,7 @@ const Login = () => {
           <button
             className=" group/btn relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black shadow-input dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
             type="submit"
-            onClick={() => handleOAuthLogin('github')}
+            onClick={() => handleOAuthLogin("github")}
           >
             <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
             <span className="text-sm text-neutral-700 dark:text-neutral-300">
@@ -85,7 +88,7 @@ const Login = () => {
           <button
             className=" group/btn relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black shadow-input dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
             type="submit"
-            onClick={() => handleOAuthLogin('google')}
+            onClick={() => handleOAuthLogin("google")}
           >
             <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
             <span className="text-sm text-neutral-700 dark:text-neutral-300">
@@ -120,15 +123,15 @@ const BottomGradient = () => {
 
 const LabelInputContainer = ({
   children,
-  className
+  className,
 }: {
   children: React.ReactNode;
   className?: string;
 }) => {
   return (
-    <div className={cn('flex w-full flex-col space-y-2', className)}>
+    <div className={cn("flex w-full flex-col space-y-2", className)}>
       {children}
     </div>
   );
 };
-export default Login;
+export default SignUp;

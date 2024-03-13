@@ -1,21 +1,19 @@
-import { Movie } from '@/movie.types';
-import Image from 'next/image';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+"use client";
+import { Movie } from "../../movie.types";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
-const MovieDetail = () => {
-  const router = useRouter();
-  const { id: movieId } = router.query;
+const MovieDetail = ({ params }: { params: { movieId: string } }) => {
   const [movieDetails, setMovieDetails] = useState<Movie>();
-  const imageUrl = 'https://image.tmdb.org/t/p/original';
+  const imageUrl = "https://image.tmdb.org/t/p/original";
 
   useEffect(() => {
-    if (movieId !== undefined) {
-      fetch(`http://localhost:8000/movie/${movieId}}`)
-        .then(res => res.json())
-        .then(data => setMovieDetails(data));
+    if (params.movieId !== undefined) {
+      fetch(`http://localhost:8000/movie/${params.movieId}}`)
+        .then((res) => res.json())
+        .then((data) => setMovieDetails(data));
     }
-  }, [movieId]);
+  }, [params.movieId]);
 
   return movieDetails ? (
     <div className="mx-auto max-w-screen-lg">
@@ -42,7 +40,7 @@ const MovieDetail = () => {
               alt={movieDetails.title}
               width={200}
               height={300}
-              style={{ borderRadius: '10px' }}
+              style={{ borderRadius: "10px" }}
             />
           </div>
           <div>
