@@ -1,11 +1,14 @@
 from typing import Optional
 
 import requests
+from db.models import Review
 from core.config import settings
 from db.base_class import Base
 from db.session import engine
-from fastapi import FastAPI
+from db.session import SessionLocal
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 
 
 def create_tables():
@@ -13,6 +16,15 @@ def create_tables():
 
 
 origins = ["http://localhost:3000"]
+
+
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 def start_application():
@@ -89,6 +101,12 @@ async def get_popular_shows(page: Optional[str] = 1):
     response = requests.get(url, headers=headers)
 
     return response.json()
+
+
+@app.get("/allReviews/")
+async def get_all_reviews(db: Session = Depends(get_db)):
+    db_response = db.query(Review).all()
+    return db_response
 
 
 # TODO: Routes to Create
