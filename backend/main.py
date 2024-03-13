@@ -89,3 +89,16 @@ async def get_popular_shows(page: Optional[str] = 1):
     response = requests.get(url, headers=headers)
 
     return response.json()
+
+
+# TODO: Routes to Create
+# - Search Movies
+# - Search TV Shows
+# - Follow User
+# - Unfollow User
+# - User Created
+# - User Updated
+# - New Review
+# - Get Reviews of Following
+# - Get Reviews of User
+# - Get Reviews of Movie/TV Show
