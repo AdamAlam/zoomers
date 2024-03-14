@@ -112,9 +112,7 @@ async def get_all_reviews(db: Session = Depends(get_db)):
 
 
 # New Review
-@app.post(
-    "/reviews/", response_model=ReviewResponse
-)  # Ensure ReviewResponse matches your desired output structure
+@app.post("/reviews/", response_model=ReviewResponse)
 async def create_review(review_data: ReviewCreate, db: Session = Depends(get_db)):
     existing_review = (
         db.query(Review)
