@@ -56,7 +56,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
     axios
       .post(`http://localhost:8000/reviews`, {
         MediaId: params.movieId,
-        stars: 5,
+        stars: formData.stars,
         ReviewText: formData.reviewText || '',
         User: 1
       })
