@@ -18,7 +18,7 @@
   - [ ] Unfollow User
   - [ ] Get all reviews of followed users
   - [ ] Get all of own reviews
-  - [ ] Get all reviews of specific movie/tv show
+  - [x] Get all reviews of specific movie/tv show
   - [ ] Create backend route to get the average rating for a movie/tv show
 
 ## Misc
