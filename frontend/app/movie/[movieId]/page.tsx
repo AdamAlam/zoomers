@@ -20,7 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import axios from 'axios';
 import Image from 'next/image';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Movie } from '../../movie.types';
 
 interface FormData {
@@ -65,9 +65,11 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
   // Get reviews for this movie
   useEffect(() => {
     if (params.movieId !== undefined) {
-      updateReviews();
+      fetch(`http://localhost:8000/reviews/${params.movieId}`)
+        .then(res => res.json())
+        .then(data => setReviews(data));
     }
-  }, [params.movieId, updateReviews]);
+  }, [params.movieId]);
 
   const handleReviewSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
