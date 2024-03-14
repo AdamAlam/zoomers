@@ -1,4 +1,6 @@
 'use client';
+import ReviewStack from '@/app/components/ReviewStack';
+import { Review } from '@/app/review.types';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -18,7 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import axios from 'axios';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Movie } from '../../movie.types';
 
 interface FormData {
@@ -31,18 +33,27 @@ interface FormData {
 const MovieDetail = ({ params }: { params: { movieId: string } }) => {
   const { toast } = useToast();
   const [movieDetails, setMovieDetails] = useState<Movie>();
+  const [reviews, setReviews] = useState<Review[]>([]);
   const imageUrl = 'https://image.tmdb.org/t/p/original';
   const [formData, setFormData] = useState<FormData>({
     reviewText: '',
     stars: 2.5,
     mediaId: params.movieId,
-    user: 1
+    user: 6
   });
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // TODO: Figure out what to do with this
+  const updateReviews = () => {
+    fetch(`http://localhost:8000/reviews/${params.movieId}`)
+      .then(res => res.json())
+      .then(data => setReviews(data));
+  };
+
+  // Get movie details
   useEffect(() => {
     if (params.movieId !== undefined) {
       fetch(`http://localhost:8000/movie/${params.movieId}}`)
@@ -51,6 +62,13 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
     }
   }, [params.movieId]);
 
+  // Get reviews for this movie
+  useEffect(() => {
+    if (params.movieId !== undefined) {
+      updateReviews();
+    }
+  }, [params.movieId, updateReviews]);
+
   const handleReviewSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     axios
@@ -58,7 +76,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
         MediaId: params.movieId,
         stars: formData.stars,
         ReviewText: formData.reviewText || '',
-        User: 1
+        User: formData.user
       })
       .then(res => {
         if (res.status === 200) {
@@ -67,6 +85,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
             description: `Your review for ${movieDetails?.title} been submitted`,
             duration: 5000
           });
+          updateReviews();
         }
       })
       .catch(err => {
@@ -160,6 +179,21 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
               </CardContent>
             </Card>
           </div>
+        </div>
+        <div>
+          {reviews.length > 0 && (
+            <ReviewStack
+              reviews={reviews.map(review => {
+                console.log(review);
+                return {
+                  id: review.id,
+                  name: `${review.DisplayName} - ${review.stars}/5 Stars`,
+                  designation: new Date(review.Date).toLocaleDateString(),
+                  content: <p>{review.ReviewText}</p>
+                };
+              })}
+            />
+          )}
         </div>
       </div>
     </div>
