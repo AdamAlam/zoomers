@@ -4,8 +4,8 @@ from typing import Optional
 import requests
 from core.config import settings
 from db.base_class import Base
-from db.models import Review
-from db.schemas import ReviewCreate, ReviewResponse
+from db.models import Review, User
+from db.schemas import ReviewByMediaResponse, ReviewCreate, ReviewResponse
 from db.session import SessionLocal, engine
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -145,13 +145,33 @@ async def create_review(review_data: ReviewCreate, db: Session = Depends(get_db)
     return new_review
 
 
-# TODO: Routes to Create
-# - Search Movies
-# - Search TV Shows
-# - Follow User
-# - Unfollow User
-# - User Created
-# - User Updated
-# - Get Reviews of Following
-# - Get Reviews of User
-# - Get Reviews of Movie/TV Show
+# TODO: Maybe we should return name instead of display name?
+@app.get("/reviews/{media_id}", response_model=list[ReviewByMediaResponse])
+async def get_reviews_by_media_id(media_id: int, db: Session = Depends(get_db)):
+    db_response = (
+        db.query(
+            Review.id,
+            Review.stars,
+            Review.ReviewText,
+            Review.Date,
+            Review.MediaId,
+            User.DisplayName,
+        )
+        .join(User, Review.User == User.id)
+        .filter(Review.MediaId == media_id)
+        .all()
+    )
+
+    result = [
+        ReviewByMediaResponse(
+            id=review.id,
+            stars=review.stars,
+            ReviewText=review.ReviewText,
+            Date=review.Date,
+            MediaId=review.MediaId,
+            DisplayName=review.DisplayName,
+        )
+        for review in db_response
+    ]
+
+    return result
