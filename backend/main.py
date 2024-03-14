@@ -112,8 +112,22 @@ async def get_all_reviews(db: Session = Depends(get_db)):
 
 
 # New Review
-@app.post("/reviews/", response_model=ReviewResponse)
+@app.post(
+    "/reviews/", response_model=ReviewResponse
+)  # Ensure ReviewResponse matches your desired output structure
 async def create_review(review_data: ReviewCreate, db: Session = Depends(get_db)):
+    existing_review = (
+        db.query(Review)
+        .filter(Review.User == review_data.User, Review.MediaId == review_data.MediaId)
+        .first()
+    )
+
+    if existing_review:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"A review by user {review_data.User} for media {review_data.MediaId} already exists.",
+        )
+
     new_review = Review(
         User=review_data.User,
         stars=review_data.stars,
