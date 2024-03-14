@@ -82,7 +82,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
   return movieDetails ? (
     <div className="mx-auto max-w-screen-lg">
       <div className="flex flex-col items-center justify-center">
-        <div className="relative mb-4 h-[500px] w-full">
+        <div className="relative mb-4 h-[450px] w-full">
           <Image
             src={`${imageUrl}${movieDetails.backdrop_path}`}
             layout="fill"
@@ -97,7 +97,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
           {/* Overlay for right side fade */}
           {/* <div className="absolute bottom-0 right-0 top-0 w-32 bg-gradient-to-l from-white to-transparent" /> */}
         </div>
-        <div className="flex w-full justify-start">
+        <div className="flex w-[95%] justify-start">
           <div className="mr-8 shrink-0">
             <Image
               src={`${imageUrl}${movieDetails.poster_path}`}
@@ -112,12 +112,13 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
             <p className="mb-2 text-sm uppercase">{movieDetails.tagline}</p>
             <p className="mr-4">{movieDetails.overview}</p>
           </div>
-          <div className="flex min-h-[300px] min-w-[350px]">
+          <div className="flex min-h-[300px] min-w-[30%]">
             <Card className="grow-1 w-full">
               <CardHeader>
                 <CardTitle>Add A Review</CardTitle>
                 <CardDescription>
-                  Create new review for {movieDetails.title}
+                  Create new review for{' '}
+                  <span className="underline">{movieDetails.title}</span>
                 </CardDescription>
               </CardHeader>
               <CardContent>
