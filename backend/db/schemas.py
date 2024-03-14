@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -22,6 +24,25 @@ class ReviewSchema(BaseModel):
     stars: float
     ReviewText: str
     Date: str
+    MediaId: int
+
+    class Config:
+        orm_mode = True
+
+
+class ReviewCreate(BaseModel):
+    User: int
+    stars: float
+    ReviewText: str
+    MediaId: int
+
+
+class ReviewResponse(BaseModel):
+    id: int
+    User: int
+    stars: float
+    ReviewText: str
+    Date: datetime
     MediaId: int
 
     class Config:

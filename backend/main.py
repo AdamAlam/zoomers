@@ -1,12 +1,13 @@
+import datetime
 from typing import Optional
 
 import requests
-from db.models import Review
 from core.config import settings
 from db.base_class import Base
-from db.session import engine
-from db.session import SessionLocal
-from fastapi import Depends, FastAPI
+from db.models import Review
+from db.schemas import ReviewCreate, ReviewResponse
+from db.session import SessionLocal, engine
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
@@ -103,10 +104,33 @@ async def get_popular_shows(page: Optional[str] = 1):
     return response.json()
 
 
+# Get all reviews
 @app.get("/allReviews/")
 async def get_all_reviews(db: Session = Depends(get_db)):
     db_response = db.query(Review).all()
     return db_response
+
+
+# New Review
+@app.post("/reviews/", response_model=ReviewResponse)
+async def create_review(review_data: ReviewCreate, db: Session = Depends(get_db)):
+    new_review = Review(
+        User=review_data.User,
+        stars=review_data.stars,
+        ReviewText=review_data.ReviewText,
+        MediaId=review_data.MediaId,
+        Date=datetime.datetime.now(datetime.UTC),
+    )
+    db.add(new_review)
+    try:
+        db.commit()
+        db.refresh(new_review)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
+    return new_review
 
 
 # TODO: Routes to Create
@@ -116,7 +140,6 @@ async def get_all_reviews(db: Session = Depends(get_db)):
 # - Unfollow User
 # - User Created
 # - User Updated
-# - New Review
 # - Get Reviews of Following
 # - Get Reviews of User
 # - Get Reviews of Movie/TV Show
