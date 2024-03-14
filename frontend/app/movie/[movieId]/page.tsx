@@ -1,17 +1,12 @@
 'use client';
-import { Movie } from '../../movie.types';
-import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import axios from 'axios';
 import {
   Select,
   SelectContent,
@@ -19,8 +14,12 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
+import axios from 'axios';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { Movie } from '../../movie.types';
 
 interface FormData {
   reviewText: string;
