@@ -111,7 +111,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
           <div>
             <h1 className="mb-2 font-serif text-3xl">{movieDetails.title}</h1>
             <p className="mb-2 text-sm uppercase">{movieDetails.tagline}</p>
-            <p>{movieDetails.overview}</p>
+            <p className="mr-4">{movieDetails.overview}</p>
           </div>
           <div className="flex min-h-[300px] min-w-[350px]">
             <Card className="grow-1 w-full">
