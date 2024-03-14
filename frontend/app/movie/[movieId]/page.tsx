@@ -125,7 +125,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
               alt={movieDetails.title}
               width={200}
               height={300}
-              style={{ borderRadius: '10px' }}
+              className="rounded-md border border-black"
             />
           </div>
           <div>
