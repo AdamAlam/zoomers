@@ -47,3 +47,15 @@ class ReviewResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class ReviewByMediaResponse(BaseModel):
+    id: int
+    stars: float
+    ReviewText: str
+    Date: datetime
+    MediaId: int
+    DisplayName: str
+
+    class Config:
+        orm_mode = True
