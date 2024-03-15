@@ -5,11 +5,12 @@ import requests
 from core.config import settings
 from db.base_class import Base
 from db.models import Review, User
-from db.schemas import ReviewByMediaResponse, ReviewCreate, ReviewResponse
+from db.schemas import ReviewByMediaResponse, ReviewCreate, ReviewResponse, UserCreate
 from db.session import SessionLocal, engine
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+import bcrypt
 
 
 def create_tables():
@@ -175,3 +176,58 @@ async def get_reviews_by_media_id(media_id: int, db: Session = Depends(get_db)):
     ]
 
     return result
+
+
+@app.post("/signup/")
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.Email == user.Email).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"User with email {user.Email} already exists.",
+        )
+
+    hashed_pass = bcrypt.hashpw(user.Password.encode("utf-8"), bcrypt.gensalt()).decode(
+        "utf-8"
+    )
+    new_user = User(
+        Email=user.Email,
+        Username=user.Username,
+        PasswordHash=hashed_pass,
+        DisplayName=user.DisplayName,
+        Bio=user.Bio,
+        ProfilePictureUrl=user.ProfilePictureUrl,
+        IsPrivate=user.IsPrivate,
+        FirstName=user.FirstName,
+        LastName=user.LastName,
+    )
+
+    db.add(new_user)
+    try:
+        db.commit()
+        db.refresh(new_user)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
+    return new_user
+
+
+# TODO: We should pass our params as headers, not as query params
+@app.post("/login/")
+def login_user(email: str, password: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.Email == email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with email {email} not found.",
+        )
+
+    if not bcrypt.checkpw(password.encode("utf-8"), bytes(user.PasswordHash, "utf-8")):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password."
+        )
+
+    # TODO: Generate JWT token and return it
+    return user
