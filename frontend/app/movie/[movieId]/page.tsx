@@ -2,27 +2,14 @@
 import ReviewStack from '@/app/components/ReviewStack';
 import { Review } from '@/app/review.types';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import axios from 'axios';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { Rating } from 'react-simple-star-rating';
 import { Movie } from '../../movie.types';
-
 interface FormData {
   reviewText: string;
   stars: number;
@@ -114,9 +101,10 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
           <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
 
           {/* Overlay for left side fade
-          <div className="absolute bottom-0 left-0 top-0 w-32 bg-gradient-to-r from-white to-transparent" />
           {/* Overlay for right side fade */}
-          {/* <div className="absolute bottom-0 right-0 top-0 w-32 bg-gradient-to-l from-white to-transparent" /> */}
+          <div className="absolute bottom-0 left-0 top-0 w-32 bg-gradient-to-r from-white to-transparent" />
+
+          <div className="absolute bottom-0 right-0 top-0 w-32 bg-gradient-to-l from-white to-transparent" />
         </div>
         <div className="flex w-[95%] justify-start">
           <div className="mr-8 shrink-0">
@@ -137,43 +125,26 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
             <Card className="grow-1 w-full">
               <CardHeader>
                 <CardTitle>Add A Review</CardTitle>
-                <CardDescription>
-                  Create new review for{' '}
-                  <span className="underline">{movieDetails.title}</span>
-                </CardDescription>
+                <Rating
+                  initialValue={formData.stars}
+                  onClick={rate => setFormData({ ...formData, stars: rate })}
+                  allowFraction
+                  size={30}
+                  SVGclassName="inline-block"
+                  className="mt-2"
+                />
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleReviewSubmit}>
+                  {/* // TODO: When text area is resized, the review card move. We need to determine what to do with this */}
                   <Textarea
                     placeholder="Leave a Review Here"
+                    // TODO: Figure out what to do with this TS error
                     onChange={handleFormChange}
                     name="reviewText"
                     className="mb-4 w-full"
                   />
-                  {/* //TODO: I will make a custom stars component eventually */}
-                  <Select
-                    onValueChange={e => {
-                      setFormData({ ...formData, stars: parseFloat(e) });
-                    }}
-                    name="stars"
-                    defaultValue={formData.stars.toString()}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Rating" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0.5">0.5</SelectItem>
-                      <SelectItem value="1">1</SelectItem>
-                      <SelectItem value="1.5">1.5</SelectItem>
-                      <SelectItem value="2">2</SelectItem>
-                      <SelectItem value="2.5">2.5</SelectItem>
-                      <SelectItem value="3">3</SelectItem>
-                      <SelectItem value="3.5">3.5</SelectItem>
-                      <SelectItem value="4">4</SelectItem>
-                      <SelectItem value="4.5">4.5</SelectItem>
-                      <SelectItem value="5">5</SelectItem>
-                    </SelectContent>
-                  </Select>
+
                   <Button type="submit" className="mt-4">
                     Submit New Review
                   </Button>
