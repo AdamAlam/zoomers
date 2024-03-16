@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Rating } from 'react-simple-star-rating';
 import { Movie } from '../../movie.types';
+
 interface FormData {
   reviewText: string;
   stars: number;
