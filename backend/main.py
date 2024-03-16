@@ -6,7 +6,8 @@ import requests
 from core.config import settings
 from db.base_class import Base
 from db.models import Review, User
-from db.schemas import ReviewByMediaResponse, ReviewCreate, ReviewResponse, UserCreate
+from db.schemas import (ReviewByMediaResponse, ReviewCreate, ReviewResponse,
+                        UserCreate)
 from db.session import SessionLocal, engine
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
