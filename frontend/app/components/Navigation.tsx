@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import {
-  Dialog,
+  MobileMenuDialog,
   DialogContent,
   DialogDescription,
   DialogHeader
-} from '@/components/ui/dialog';
+} from '@/components/ui/mobile-menu-dialog';
 
 import { Bars3Icon, FilmIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -37,7 +37,7 @@ const NavigationItem = ({ item, mobile = false }: Props) => {
   );
 };
 
-const MobileMenuDialog = ({
+const MobileMenu = ({
   isOpen,
   onClose
 }: {
@@ -45,7 +45,7 @@ const MobileMenuDialog = ({
   onClose: () => void;
 }) => {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <MobileMenuDialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogDescription>
@@ -69,7 +69,7 @@ const MobileMenuDialog = ({
           </DialogDescription>
         </DialogHeader>
       </DialogContent>
-    </Dialog>
+    </MobileMenuDialog>
   );
 };
 
@@ -120,7 +120,7 @@ export default function Navigation() {
           </button>
         </div>
       </nav>
-      <MobileMenuDialog
+      <MobileMenu
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
       />
