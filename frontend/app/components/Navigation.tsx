@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+// TODO: Look into replacing Dialog from headlessui with the one from shadcn.
 import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, FilmIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
