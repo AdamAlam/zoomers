@@ -1,6 +1,7 @@
 import datetime
 from typing import Optional
 
+import bcrypt
 import requests
 from core.config import settings
 from db.base_class import Base
@@ -10,7 +11,7 @@ from db.session import SessionLocal, engine
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-import bcrypt
+from util.generateJWT import generate_jwt
 
 
 def create_tables():
@@ -230,4 +231,5 @@ def login_user(email: str, password: str, db: Session = Depends(get_db)):
         )
 
     # TODO: Generate JWT token and return it
-    return user
+    JWT = generate_jwt(user.id)
+    return {"jwt": JWT}

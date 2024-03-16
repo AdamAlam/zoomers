@@ -1,7 +1,7 @@
 import os
-from dotenv import load_dotenv
-
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 env_path = Path(".") / ".env"
 load_dotenv(dotenv_path=env_path)
@@ -13,6 +13,7 @@ class Settings:
 
     DATABASE_URL = os.getenv("SUPABASE_URL")
     TMDB_BEARER = os.getenv("TMDB_BEARER")
+    JWT_SECRET = os.getenv("JWT_SECRET")
 
 
 settings = Settings()
