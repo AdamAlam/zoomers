@@ -8,7 +8,7 @@ from db.base_class import Base
 from db.models import Review, User
 from db.schemas import ReviewByMediaResponse, ReviewCreate, ReviewResponse, UserCreate
 from db.session import SessionLocal, engine
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from util.generateJWT import generate_jwt
@@ -61,7 +61,7 @@ async def get_movie_detail(movie_id):
         "Authorization": f"Bearer {settings.TMDB_BEARER}",
     }
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
 
     return response.json()
 
@@ -74,7 +74,7 @@ async def get_show_detail(show_id):
         "Authorization": f"Bearer {settings.TMDB_BEARER}",
     }
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
 
     return response.json()
 
@@ -87,7 +87,7 @@ async def get_popular_movies(page: Optional[str] = 1):
         "Authorization": f"Bearer {settings.TMDB_BEARER}",
     }
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
 
     return response.json()
 
@@ -101,7 +101,7 @@ async def get_popular_shows(page: Optional[str] = 1):
         "Authorization": f"Bearer {settings.TMDB_BEARER}",
     }
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
 
     return response.json()
 
@@ -147,7 +147,6 @@ async def create_review(review_data: ReviewCreate, db: Session = Depends(get_db)
     return new_review
 
 
-# TODO: Maybe we should return name instead of display name?
 @app.get("/reviews/{media_id}", response_model=list[ReviewByMediaResponse])
 async def get_reviews_by_media_id(media_id: int, db: Session = Depends(get_db)):
     db_response = (
@@ -215,9 +214,18 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
-# TODO: We should pass our params as headers, not as query params
 @app.post("/login/")
-def login_user(email: str, password: str, db: Session = Depends(get_db)):
+def login_user(
+    email: str = Header(None),  # Receive email from header
+    password: str = Header(None),  # Receive password from header
+    db: Session = Depends(get_db),
+):
+    if email is None or password is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email and password must be provided in the header.",
+        )
+
     user = db.query(User).filter(User.Email == email).first()
     if not user:
         raise HTTPException(
@@ -225,11 +233,10 @@ def login_user(email: str, password: str, db: Session = Depends(get_db)):
             detail=f"User with email {email} not found.",
         )
 
-    if not bcrypt.checkpw(password.encode("utf-8"), bytes(user.PasswordHash, "utf-8")):
+    if not bcrypt.checkpw(password.encode("utf-8"), user.PasswordHash.encode("utf-8")):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password."
         )
 
-    # TODO: Generate JWT token and return it
     JWT = generate_jwt(user.id)
     return {"jwt": JWT}
