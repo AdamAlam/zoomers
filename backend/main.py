@@ -6,8 +6,7 @@ import requests
 from core.config import settings
 from db.base_class import Base
 from db.models import Review, User
-from db.schemas import (ReviewByMediaResponse, ReviewCreate, ReviewResponse,
-                        UserCreate)
+from db.schemas import ReviewByMediaResponse, ReviewCreate, ReviewResponse, UserCreate
 from db.session import SessionLocal, engine
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,14 +15,21 @@ from util.generateJWT import generate_jwt
 
 
 def create_tables():
+    """Create database tables based on SQLAlchemy models."""
     Base.metadata.create_all(bind=engine)
 
 
 origins = ["http://localhost:3000"]
 
 
-# Dependency
 def get_db():
+    """
+    Dependency that provides a SQLAlchemy session for interacting with the database.
+    It automatically handles session closing.
+
+    Yields:
+        Session: SQLAlchemy session.
+    """
     db = SessionLocal()
     try:
         yield db
@@ -31,7 +37,14 @@ def get_db():
         db.close()
 
 
-def start_application():
+def start_application() -> FastAPI:
+    """
+    Initialize and configure the FastAPI application, including creating database tables
+    and setting up CORS middleware.
+
+    Returns:
+        FastAPI: The configured FastAPI application.
+    """
     app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
     create_tables()
 
@@ -51,11 +64,26 @@ app = start_application()
 
 @app.get("/")
 def home():
+    """
+    Root endpoint that returns a welcome message.
+
+    Returns:
+        dict: A welcome message.
+    """
     return {"msg": "Hello FastAPI🚀"}
 
 
 @app.get("/movie/{movie_id}")
-async def get_movie_detail(movie_id):
+async def get_movie_detail(movie_id: str):
+    """
+    Fetch and return the details of a movie from an external API using the movie ID.
+
+    Args:
+        movie_id (str): The ID of the movie to fetch details for.
+
+    Returns:
+        dict: The movie details as a JSON response.
+    """
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?language=en-US"
     headers = {
         "accept": "application/json",
@@ -68,7 +96,16 @@ async def get_movie_detail(movie_id):
 
 
 @app.get("/tvShow/{show_id}")
-async def get_show_detail(show_id):
+async def get_show_detail(show_id: str):
+    """
+    Fetch and return the details of a TV show from an external API using the show ID.
+
+    Args:
+        show_id (str): The ID of the TV show to fetch details for.
+
+    Returns:
+        dict: The TV show details as a JSON response.
+    """
     url = f"https://api.themoviedb.org/3/tv/{show_id}?language=en-US"
     headers = {
         "accept": "application/json",
@@ -82,6 +119,15 @@ async def get_show_detail(show_id):
 
 @app.get("/movies/popular/")
 async def get_popular_movies(page: Optional[str] = 1):
+    """
+    Fetch and return a list of popular movies from an external API.
+
+    Args:
+        page (Optional[str], optional): The page number of movie listings to fetch. Defaults to 1.
+
+    Returns:
+        dict: The list of popular movies as a JSON response.
+    """
     url = f"https://api.themoviedb.org/3/movie/popular?language=en-US&page={page}"
     headers = {
         "accept": "application/json",
@@ -95,6 +141,15 @@ async def get_popular_movies(page: Optional[str] = 1):
 
 @app.get("/tvShows/popular/")
 async def get_popular_shows(page: Optional[str] = 1):
+    """
+    Fetch and return a list of popular TV shows from an external API.
+
+    Args:
+        page (Optional[str], optional): The page number of TV show listings to fetch. Defaults to 1.
+
+    Returns:
+        dict: The list of popular TV shows as a JSON response.
+    """
     url = f"https://api.themoviedb.org/3/tv/popular?language=en-US&page={page}"
 
     headers = {
@@ -107,16 +162,36 @@ async def get_popular_shows(page: Optional[str] = 1):
     return response.json()
 
 
-# Get all reviews
 @app.get("/allReviews/")
 async def get_all_reviews(db: Session = Depends(get_db)):
+    """
+    Retrieve all reviews from the database.
+
+    Args:
+        db (Session, optional): SQLAlchemy database session.
+
+    Returns:
+        list: A list of all reviews.
+    """
     db_response = db.query(Review).all()
     return db_response
 
 
-# New Review
 @app.post("/reviews/", response_model=ReviewResponse)
 async def create_review(review_data: ReviewCreate, db: Session = Depends(get_db)):
+    """
+    Create a new review in the database.
+
+    Args:
+        review_data (ReviewCreate): The review data to create.
+        db (Session): SQLAlchemy database session.
+
+    Raises:
+        HTTPException: If the review already exists.
+
+    Returns:
+        ReviewResponse: The created review data.
+    """
     existing_review = (
         db.query(Review)
         .filter(Review.User == review_data.User, Review.MediaId == review_data.MediaId)
@@ -134,7 +209,7 @@ async def create_review(review_data: ReviewCreate, db: Session = Depends(get_db)
         stars=review_data.stars,
         ReviewText=review_data.ReviewText,
         MediaId=review_data.MediaId,
-        Date=datetime.datetime.now(datetime.UTC),
+        Date=datetime.datetime.now(datetime.timezone.utc),
     )
     db.add(new_review)
     try:
@@ -150,6 +225,16 @@ async def create_review(review_data: ReviewCreate, db: Session = Depends(get_db)
 
 @app.get("/reviews/{media_id}", response_model=list[ReviewByMediaResponse])
 async def get_reviews_by_media_id(media_id: int, db: Session = Depends(get_db)):
+    """
+    Retrieve reviews for a specific media ID from the database.
+
+    Args:
+        media_id (int): The ID of the media to fetch reviews for.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        list[ReviewByMediaResponse]: A list of reviews for the specified media ID.
+    """
     db_response = (
         db.query(
             Review.id,
@@ -181,6 +266,19 @@ async def get_reviews_by_media_id(media_id: int, db: Session = Depends(get_db)):
 
 @app.post("/signup/")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    """
+    Create a new user in the database.
+
+    Args:
+        user (UserCreate): The user data to create.
+        db (Session): SQLAlchemy database session.
+
+    Raises:
+        HTTPException: If the user already exists.
+
+    Returns:
+        User: The created user data.
+    """
     existing_user = db.query(User).filter(User.Email == user.Email).first()
     if existing_user:
         raise HTTPException(
@@ -217,10 +315,24 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 @app.post("/login/")
 def login_user(
-    email: str = Header(None),  # Receive email from header
-    password: str = Header(None),  # Receive password from header
+    email: str = Header(None),
+    password: str = Header(None),
     db: Session = Depends(get_db),
 ):
+    """
+    Authenticate a user and return a JWT token.
+
+    Args:
+        email (str): The email of the user trying to log in.
+        password (str): The password of the user trying to log in.
+        db (Session): SQLAlchemy database session.
+
+    Raises:
+        HTTPException: If authentication fails.
+
+    Returns:
+        dict: A JWT token for the authenticated user.
+    """
     if email is None or password is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
