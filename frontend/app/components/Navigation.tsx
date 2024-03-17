@@ -19,10 +19,7 @@ interface Props {
   mobile?: boolean;
 }
 
-const navigationItems = [
-  { name: 'Home', href: '/' },
-  { name: '????', href: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }
-];
+const navigationItems = [{ name: 'Home', href: '/' }];
 
 const NavigationItem = ({ item, mobile = false }: Props) => {
   const baseClassName = 'text-sm font-semibold leading-6 text-gray-900';
