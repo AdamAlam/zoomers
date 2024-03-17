@@ -10,7 +10,6 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Rating } from 'react-simple-star-rating';
 import { Movie } from '../../movie.types';
-
 interface FormData {
   reviewText: string;
   stars: number;
@@ -99,10 +98,9 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
             objectFit="cover"
             alt="Movie backdrop image"
           />
-          {/* Overlay for top fade */}
-          <div className="top absolute left-0 right-0 h-32 bg-gradient-to-b from-white to-transparent" />
           {/* Overlay for bottom fade */}
           <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
+
           {/* Overlay for left side fade
           {/* Overlay for right side fade */}
           <div className="absolute bottom-0 left-0 top-0 w-80 bg-gradient-to-r from-white to-transparent" />
