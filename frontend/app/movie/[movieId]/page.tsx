@@ -104,8 +104,9 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
           <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
           {/* Overlay for left side fade
           {/* Overlay for right side fade */}
-          <div className="absolute bottom-0 left-0 top-0 w-32 bg-gradient-to-r from-white to-transparent" />
-          <div className="absolute bottom-0 right-0 top-0 w-32 bg-gradient-to-l from-white to-transparent" />
+          <div className="absolute bottom-0 left-0 top-0 w-80 bg-gradient-to-r from-white to-transparent" />
+
+          <div className="absolute bottom-0 right-0 top-0 w-80 bg-gradient-to-l from-white to-transparent" />
         </div>
         <div className="flex w-[95%] justify-start">
           <div className="mr-8 shrink-0">
