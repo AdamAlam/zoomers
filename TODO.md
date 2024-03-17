@@ -13,7 +13,7 @@
 
 - [ ] Create backend routes pertaining to movies
   - [ ] Search for a specific movie
-  - [ ] Search for a specifc TV Show
+  - [ ] Search for a specific TV Show
   - [ ] Follow User
   - [ ] Unfollow User
   - [ ] Get all reviews of followed users
