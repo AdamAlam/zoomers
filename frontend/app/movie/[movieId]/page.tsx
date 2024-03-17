@@ -27,7 +27,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
     reviewText: '',
     stars: 2.5,
     mediaId: params.movieId,
-    user: 6
+    user: 1
   });
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,7 +66,8 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
         MediaId: params.movieId,
         stars: formData.stars,
         ReviewText: formData.reviewText || '',
-        User: formData.user
+        // TODO: I am using a random user id from the DB just for review variety.
+        User: Math.floor(Math.random() * (327 - 128 + 1)) + 128
       })
       .then(res => {
         if (res.status === 200) {
