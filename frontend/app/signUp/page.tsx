@@ -12,16 +12,74 @@ import { supabase } from '../lib/supabase/supabaseClient';
 import { Provider } from '@supabase/supabase-js';
 import { useToast } from '@/components/ui/use-toast';
 import { z } from 'zod';
-
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { Router } from 'lucide-react';
 const SignUp = () => {
   const { toast } = useToast();
+  const router = useRouter();
 
   const [formData, setFormData] = useState({});
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const signupFormSchema = z
+    .object({
+      firstname: z.string().min(1, 'First name is required'),
+      lastname: z.string().min(1, 'Last name is required'),
+      email: z.string().email('Invalid email address'),
+      displayName: z.string().min(1, 'Display name is required'),
+      username: z.string().min(1, 'Username is required'),
+      password: z
+        .string()
+        .min(6, 'Password must be at least 6 characters long'),
+      passwordConfirm: z.string().min(6, 'Password confirmation is required')
+    })
+    .refine(data => data.password === data.passwordConfirm, {
+      message: "Passwords don't match",
+      path: ['passwordConfirm']
+    });
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Form submitted');
-    toast({ title: 'Form submitted', description: 'success' });
+
+    const formData = new FormData(e.currentTarget);
+    const formValues = {
+      firstname: formData.get('firstname') as string,
+      lastname: formData.get('lastname') as string,
+      email: formData.get('email') as string,
+      displayName: formData.get('displayName') as string,
+      username: formData.get('username') as string,
+      password: formData.get('password') as string,
+      passwordConfirm: formData.get('passwordConfirm') as string
+    };
+
+    try {
+      signupFormSchema.parse(formValues);
+      axios
+        .post('http://localhost:8000/signup', {
+          FirstName: formValues.firstname,
+          LastName: formValues.lastname,
+          Email: formValues.email,
+          DisplayName: formValues.displayName,
+          Username: formValues.username,
+          Password: formValues.password
+        })
+        .then(res => {
+          if (res.status === 200) {
+            toast({
+              title: 'Signup Successful',
+              description:
+                "You've successfully signed up! You will be redirected to the login page."
+            });
+            setTimeout(() => {
+              router.push('/login');
+            }, 3000);
+          }
+        });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error('Form validation errors:', error.errors);
+      }
+    }
   };
 
   const handleOAuthLogin = async (provider: Provider) => {
@@ -34,19 +92,6 @@ const SignUp = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-  const FormSchema = z
-    .object({
-      email: z.string().email(),
-      password: z.string().min(6),
-      passwordConfirm: z.string().min(6),
-      firstname: z.string(),
-      lastname: z.string()
-    })
-    .refine(data => data.password === data.passwordConfirm, {
-      message: 'Passwords do not match',
-      path: ['passwordConfirm']
-    });
 
   return (
     <div className="mx-auto w-full max-w-md rounded-none bg-white p-4 shadow-input dark:bg-black md:rounded-2xl md:p-8">
@@ -84,6 +129,24 @@ const SignUp = () => {
             name="email"
             placeholder="projectmayhem@fc.com"
             type="email"
+            onChange={handleFormChange}
+          />
+        </LabelInputContainer>
+        <LabelInputContainer className="mb-4">
+          <Label htmlFor="displayName">Display Name</Label>
+          <Input
+            name="displayName"
+            placeholder="The Narrator"
+            type="text"
+            onChange={handleFormChange}
+          />
+        </LabelInputContainer>
+        <LabelInputContainer className="mb-4">
+          <Label htmlFor="username">Username</Label>
+          <Input
+            name="username"
+            placeholder="XxTylerDurdenxX"
+            type="text"
             onChange={handleFormChange}
           />
         </LabelInputContainer>
