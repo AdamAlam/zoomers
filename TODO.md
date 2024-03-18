@@ -13,7 +13,7 @@
 
 - [ ] Create backend routes pertaining to movies
   - [ ] Search for a specific movie
-  - [ ] Search for a specifc TV Show
+  - [ ] Search for a specific TV Show
   - [ ] Follow User
   - [ ] Unfollow User
   - [ ] Get all reviews of followed users
@@ -25,3 +25,4 @@
 
 - [ ] Determine which user is logged in after auth. We should consider not using OAuth for now so that we have more control over user auth
 - [ ] Integrate ESLint into project for better standardization.
+- [ ] Create TS Docs and Python Docstrings for all functions

@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -59,3 +60,15 @@ class ReviewByMediaResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UserCreate(BaseModel):
+    Email: str
+    Username: str
+    Password: str
+    DisplayName: str
+    Bio: Optional[str] = None
+    ProfilePictureUrl: Optional[str] = None
+    IsPrivate: Optional[bool] = False
+    FirstName: str
+    LastName: Optional[str] = None
