@@ -361,6 +361,8 @@ def login_user(
     return {"jwt": JWT}
 
 
+# TODO: We might need to start only allowing these requests to go through
+#  if the JWT is valid and the user is authenticated.
 @app.post("/follow/", status_code=status.HTTP_201_CREATED)
 def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
     """
@@ -404,6 +406,8 @@ def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
     return {"message": "Follow successful"}
 
 
+# TODO: We might need to start only allowing these requests to go through
+#  if the JWT is valid and the user is authenticated.
 @app.delete("/unfollow/", status_code=status.HTTP_200_OK)
 def unfollow_user(followerId: int, followedId: int, db: Session = Depends(get_db)):
     """
