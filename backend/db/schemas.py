@@ -72,3 +72,8 @@ class UserCreate(BaseModel):
     IsPrivate: Optional[bool] = False
     FirstName: str
     LastName: Optional[str] = None
+
+
+class FollowCreate(BaseModel):
+    followerId: int
+    followedId: int

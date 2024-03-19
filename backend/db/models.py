@@ -24,8 +24,8 @@ class Follow(Base):
     __tablename__ = "Follow"
 
     id = Column(Integer, primary_key=True, index=True)
-    FollowerId = Column(Integer, ForeignKey("User.id"))
-    FolloweeId = Column(Integer, ForeignKey("User.id"))
+    followerId = Column(Integer, ForeignKey("User.id"))
+    followedId = Column(Integer, ForeignKey("User.id"))
 
 
 class Review(Base):

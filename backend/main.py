@@ -5,8 +5,14 @@ import bcrypt
 import requests
 from core.config import settings
 from db.base_class import Base
-from db.models import Review, User
-from db.schemas import ReviewByMediaResponse, ReviewCreate, ReviewResponse, UserCreate
+from db.models import Follow, Review, User
+from db.schemas import (
+    FollowCreate,
+    ReviewByMediaResponse,
+    ReviewCreate,
+    ReviewResponse,
+    UserCreate,
+)
 from db.session import SessionLocal, engine
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -353,3 +359,33 @@ def login_user(
 
     JWT = generate_jwt(user.id)
     return {"jwt": JWT}
+
+
+@app.post("/follow/", status_code=status.HTTP_201_CREATED)
+def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
+    existing_follow = (
+        db.query(Follow)
+        .filter(
+            Follow.followerId == follow.followerId,
+            Follow.followedId == follow.followedId,
+        )
+        .first()
+    )
+
+    if existing_follow:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You already follow this user.",
+        )
+
+    db_follow = Follow(followerId=follow.followerId, followedId=follow.followedId)
+    db.add(db_follow)
+    try:
+        db.commit()
+        db.refresh(db_follow)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
+    return {"message": "Follow successful"}
