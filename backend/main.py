@@ -363,6 +363,19 @@ def login_user(
 
 @app.post("/follow/", status_code=status.HTTP_201_CREATED)
 def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
+    """
+    Create a new follow relationship between two users.
+
+    Args:
+        follow (FollowCreate): The follow relationship to be created.
+        db (Session, optional): The database session. Defaults to Depends(get_db).
+
+    Returns:
+        dict: A dictionary containing a success message.
+
+    Raises:
+        HTTPException: If the follow relationship already exists or if there is an internal server error.
+    """
     existing_follow = (
         db.query(Follow)
         .filter(
@@ -393,6 +406,20 @@ def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
 
 @app.delete("/unfollow/", status_code=status.HTTP_200_OK)
 def unfollow_user(followerId: int, followedId: int, db: Session = Depends(get_db)):
+    """
+    Unfollows a user by deleting the follow relationship from the database.
+
+    Args:
+        followerId (int): The ID of the follower user.
+        followedId (int): The ID of the user being followed.
+        db (Session, optional): The database session. Defaults to Depends(get_db).
+
+    Returns:
+        dict: A dictionary containing a success message.
+
+    Raises:
+        HTTPException: If the follow relationship does not exist or if there is an internal server error.
+    """
     follow_relationship = (
         db.query(Follow)
         .filter(Follow.followerId == followerId, Follow.followedId == followedId)
