@@ -25,6 +25,8 @@ jobs:
         with:
           push: true
           tags: adamalam17/zoomers:latest
+          context: ./backend
+          file: ./backend/Dockerfile
           build-args: |
             SUPABASE_URL=${{ secrets.SUPABASE_URL }}
             TMDB_BEARER=${{ secrets.TMDB_BEARER }}
