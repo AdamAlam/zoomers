@@ -389,3 +389,29 @@ def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
         )
     return {"message": "Follow successful"}
+
+
+@app.delete("/unfollow/", status_code=status.HTTP_200_OK)
+def unfollow_user(followerId: int, followedId: int, db: Session = Depends(get_db)):
+    follow_relationship = (
+        db.query(Follow)
+        .filter(Follow.followerId == followerId, Follow.followedId == followedId)
+        .first()
+    )
+
+    if not follow_relationship:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Follow relationship does not exist.",
+        )
+
+    try:
+        db.delete(follow_relationship)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
+
+    return {"message": "Unfollow successful"}
