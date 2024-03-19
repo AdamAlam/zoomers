@@ -1,13 +1,14 @@
-"use client";
-import Image from "next/image";
-import { Movie } from "../movie.types";
-import Link from "next/link";
+'use client';
+import Image from 'next/image';
+import { Movie } from '../movie.types';
+import Link from 'next/link';
 
 interface Props {
   movies: Movie[];
 }
+
 const MovieGrid = ({ movies }: Props) => {
-  const imageBaseUrl = "https://image.tmdb.org/t/p/original";
+  const imageBaseUrl = 'https://image.tmdb.org/t/p/original';
 
   return (
     <div className="ml-5">

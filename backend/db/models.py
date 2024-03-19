@@ -1,5 +1,8 @@
+# pylint: disable=E0402
+
+from sqlalchemy import TIMESTAMP, Boolean, Column, Float, ForeignKey, Integer, String
+
 from .session import Base
-from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, Float, TIMESTAMP
 
 
 class User(Base):
