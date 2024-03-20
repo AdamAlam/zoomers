@@ -18,6 +18,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from util.generateJWT import generate_jwt
+import jwt
 
 
 def create_tables():
@@ -167,6 +168,28 @@ async def get_popular_shows(page: Optional[str] = 1):
 
     return response.json()
 
+@app.get("/searchMovie/")
+async def search_movie(query: str):
+    """
+    Search for a movie by query string and return the movie details from an external API.
+
+    Args:
+     query (str): The query string to search for a movie.
+
+    Returns:
+        dict: The movie details as a JSON response.
+    """
+    print(query)
+    url = f"https://api.themoviedb.org/3/search/movie?language=en-US&query={query}"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {settings.TMDB_BEARER}",
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
+
+    return response.json()
+
 
 @app.get("/allReviews/")
 async def get_all_reviews(db: Session = Depends(get_db)):
@@ -198,6 +221,8 @@ async def create_review(review_data: ReviewCreate, db: Session = Depends(get_db)
     Returns:
         ReviewResponse: The created review data.
     """
+    print(review_data)
+    
     existing_review = (
         db.query(Review)
         .filter(Review.User == review_data.User, Review.MediaId == review_data.MediaId)
@@ -446,3 +471,46 @@ def unfollow_user(followerId: int, followedId: int, db: Session = Depends(get_db
         )
 
     return {"message": "Unfollow successful"}
+
+@app.get("/ownReviews", response_model=list[ReviewByMediaResponse])
+async def get_own_reviews(jwtToken: str = Header(None), db: Session = Depends(get_db)):
+    """
+    TODO: Add docstring
+    """
+    print(jwtToken)
+    if jwtToken is None :
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User JWT token must be provided in the header.",
+        )
+    decoded_jwt = jwt.decode(jwtToken, settings.JWT_SECRET, algorithms=["HS256"])
+    print(decoded_jwt)
+    user_id = decoded_jwt["user_id"]
+
+    db_response = (
+        db.query(
+            Review.id,
+            Review.stars,
+            Review.ReviewText,
+            Review.Date,
+            Review.MediaId,
+            User.DisplayName,
+        )
+        .join(User, User.id == Review.User)
+        .filter(User.id == user_id)
+        .all()
+    )
+
+    result = [
+        ReviewByMediaResponse(
+            id=review.id,
+            stars=review.stars,
+            ReviewText=review.ReviewText,
+            Date=review.Date,
+            MediaId=review.MediaId,
+            DisplayName=review.DisplayName,
+        )
+        for review in db_response
+    ]
+
+    return result
