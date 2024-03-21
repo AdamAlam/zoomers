@@ -11,7 +11,7 @@ from db.session import SessionLocal, engine
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from util.generateJWT import generate_jwt
+from util.auth import generate_jwt, validate_jwt
 
 
 def create_tables():
@@ -353,3 +353,29 @@ def login_user(
 
     JWT = generate_jwt(user.id)
     return {"jwt": JWT}
+
+
+# This is the first protected route in the app.
+# It requires a valid JWT as an auth header to access it.
+@app.get("/myReviews", response_model=list[ReviewResponse])
+def get_my_reviews(
+    payload: dict = Depends(validate_jwt), db: Session = Depends(get_db)
+):
+    """
+    Get all the reviews by the user.
+
+    Returns:
+        list: A list of all reviews by the user.
+    """
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+    reviews = db.query(Review).filter(Review.User == user_id).all()
+    if not reviews:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No reviews found."
+        )
+
+    return reviews
