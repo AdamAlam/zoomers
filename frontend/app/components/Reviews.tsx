@@ -53,9 +53,17 @@ export default function Reviews({ params }: { params: { movieId: string } }) {
                 <h3 className="font-medium text-gray-900">
                   {review.DisplayName}
                 </h3>
-                {/* TODO: Make displayed time pretty */}
                 <p>
-                  <time dateTime={review.Date}>{review.Date}</time>
+                  <time dateTime={review.Date}>
+                    {new Date(review.Date).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      timeZoneName: 'short'
+                    })}
+                  </time>
                 </p>
                 <div className="mt-4 flex items-center">
                   {[0, 1, 2, 3, 4].map(rating => (
