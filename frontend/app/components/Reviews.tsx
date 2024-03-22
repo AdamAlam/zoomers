@@ -29,8 +29,7 @@ export default function Reviews({ params }: { params: { movieId: string } }) {
     <div className="bg-white">
       <div>
         <h2 className="sr-only">Customer Reviews</h2>
-
-        <div className="-my-10">
+        <div className="my-10">
           {reviews.map((review, reviewIdx) => (
             <div
               key={review.id}
@@ -54,24 +53,38 @@ export default function Reviews({ params }: { params: { movieId: string } }) {
                 <h3 className="font-medium text-gray-900">
                   {review.DisplayName}
                 </h3>
+                {/* TODO: Make displayed time pretty */}
                 <p>
                   <time dateTime={review.Date}>{review.Date}</time>
                 </p>
-
                 <div className="mt-4 flex items-center">
                   {[0, 1, 2, 3, 4].map(rating => (
-                    <StarIcon
-                      key={rating}
-                      className={cn(
-                        review.stars > rating
-                          ? 'text-yellow-400'
-                          : 'text-gray-300',
-                        'h-5 w-5 flex-shrink-0'
+                    <div key={rating} className="relative">
+                      <StarIcon
+                        className={cn(
+                          review.stars > rating
+                            ? 'text-yellow-400'
+                            : 'text-gray-300',
+                          'h-5 w-5 flex-shrink-0'
+                        )}
+                        aria-hidden="true"
+                      />
+                      {review.stars > rating && review.stars < rating + 1 && (
+                        <StarIcon
+                          className="absolute left-0 top-0 h-5 w-5 flex-shrink-0"
+                          style={{
+                            // This style is to clip the star to display only a percentage of it
+                            clipPath: 'inset(0 0 0 50%)',
+                            // This is the RGB color equivalent of text-gray-300
+                            color: 'rgb(209 213 219)'
+                          }}
+                          aria-hidden="true"
+                        />
                       )}
-                      aria-hidden="true"
-                    />
+                    </div>
                   ))}
                 </div>
+
                 <p className="sr-only">{review.stars} out of 5 stars</p>
 
                 <div

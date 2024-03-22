@@ -155,20 +155,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
             </Card>
           </div>
         </div>
-        <div>
-          {/*{reviews.length > 0 && (*/}
-          {/*  <ReviewStack*/}
-          {/*    reviews={reviews.map(review => {*/}
-          {/*      console.log(review);*/}
-          {/*      return {*/}
-          {/*        id: review.id,*/}
-          {/*        name: `${review.DisplayName} - ${review.stars}/5 Stars`,*/}
-          {/*        designation: new Date(review.Date).toLocaleDateString(),*/}
-          {/*        content: <p>{review.ReviewText}</p>*/}
-          {/*      };*/}
-          {/*    })}*/}
-          {/*  />*/}
-          {/*)}*/}
+        <div className="w-full">
           {reviews.length > 0 && <Reviews params={params} />}
         </div>
       </div>
