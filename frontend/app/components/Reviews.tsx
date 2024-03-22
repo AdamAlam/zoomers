@@ -92,13 +92,11 @@ export default function Reviews({ params }: { params: { movieId: string } }) {
                     </div>
                   ))}
                 </div>
-
+                {/* For screen reader */}
                 <p className="sr-only">{review.stars} out of 5 stars</p>
-
-                <div
-                  className="prose prose-sm mt-4 max-w-none text-gray-500"
-                  dangerouslySetInnerHTML={{ __html: review.ReviewText }}
-                />
+                <div className="prose prose-sm mt-4 max-w-none text-gray-500">
+                  {review.ReviewText}
+                </div>
               </div>
             </div>
           ))}
