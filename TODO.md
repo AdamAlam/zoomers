@@ -14,12 +14,13 @@
 - [ ] Create backend routes pertaining to movies
   - [ ] Search for a specific movie
   - [ ] Search for a specific TV Show
-  - [ ] Follow User
-  - [ ] Unfollow User
+  - [x] Follow User
+  - [x] Unfollow User
   - [ ] Get all reviews of followed users
   - [ ] Get all of own reviews
   - [x] Get all reviews of specific movie/tv show
   - [ ] Create backend route to get the average rating for a movie/tv show
+  - [ ] Create validation function that accepts JWT and validates users
 
 ## Misc
 

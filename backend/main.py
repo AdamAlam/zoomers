@@ -5,8 +5,14 @@ import bcrypt
 import requests
 from core.config import settings
 from db.base_class import Base
-from db.models import Review, User
-from db.schemas import ReviewByMediaResponse, ReviewCreate, ReviewResponse, UserCreate
+from db.models import Follow, Review, User
+from db.schemas import (
+    FollowCreate,
+    ReviewByMediaResponse,
+    ReviewCreate,
+    ReviewResponse,
+    UserCreate,
+)
 from db.session import SessionLocal, engine
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -405,3 +411,90 @@ def get_my_reviews(
         )
 
     return reviews
+
+
+# TODO: We might need to start only allowing these requests to go through
+#  if the JWT is valid and the user is authenticated.
+@app.post("/follow/", status_code=status.HTTP_201_CREATED)
+def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
+    """
+    Create a new follow relationship between two users.
+
+    Args:
+        follow (FollowCreate): The follow relationship to be created.
+        db (Session, optional): The database session. Defaults to Depends(get_db).
+
+    Returns:
+        dict: A dictionary containing a success message.
+
+    Raises:
+        HTTPException: If the follow relationship already exists or if there is an internal server error.
+    """
+    existing_follow = (
+        db.query(Follow)
+        .filter(
+            Follow.followerId == follow.followerId,
+            Follow.followedId == follow.followedId,
+        )
+        .first()
+    )
+
+    if existing_follow:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You already follow this user.",
+        )
+
+    db_follow = Follow(followerId=follow.followerId, followedId=follow.followedId)
+    db.add(db_follow)
+    try:
+        db.commit()
+        db.refresh(db_follow)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
+    return {"message": "Follow successful"}
+
+
+# TODO: We might need to start only allowing these requests to go through
+#  if the JWT is valid and the user is authenticated.
+@app.delete("/unfollow/", status_code=status.HTTP_200_OK)
+def unfollow_user(followerId: int, followedId: int, db: Session = Depends(get_db)):
+    """
+    Unfollows a user by deleting the follow relationship from the database.
+
+    Args:
+        followerId (int): The ID of the follower user.
+        followedId (int): The ID of the user being followed.
+        db (Session, optional): The database session. Defaults to Depends(get_db).
+
+    Returns:
+        dict: A dictionary containing a success message.
+
+    Raises:
+        HTTPException: If the follow relationship does not exist or if there is an internal server error.
+    """
+    follow_relationship = (
+        db.query(Follow)
+        .filter(Follow.followerId == followerId, Follow.followedId == followedId)
+        .first()
+    )
+
+    if not follow_relationship:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Follow relationship does not exist.",
+        )
+
+    try:
+        db.delete(follow_relationship)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
+
+    return {"message": "Unfollow successful"}
