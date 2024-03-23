@@ -16,8 +16,9 @@ from db.schemas import (
 from db.session import SessionLocal, engine
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import func
 from sqlalchemy.orm import Session
-from util.generateJWT import generate_jwt
+from util.auth import generate_jwt, validate_jwt
 
 
 def create_tables():
@@ -357,8 +358,59 @@ def login_user(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password."
         )
 
-    JWT = generate_jwt(user.id)
+    JWT = generate_jwt(user.id)  # type: ignore
     return {"jwt": JWT}
+
+
+@app.get("/averageRating/{media_id}")
+def get_average_rating(media_id: int, db: Session = Depends(get_db)):
+    """
+    Retrieve the average rating for a specific media ID from the database.
+    Return a JSON object if the average rating exists, else return a 404 error.
+
+    Args:
+        media_id (int): The ID of the media to fetch the average rating for.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        JSON object with the average rating or a 404 error if no ratings found.
+    """
+    average_rating = (
+        db.query(func.avg(Review.stars)).filter(Review.MediaId == media_id).scalar()
+    )
+
+    if average_rating is None:
+        raise HTTPException(
+            status_code=404, detail=f"No ratings found for media ID {media_id}"
+        )
+
+    return {"average_rating": float(average_rating)}
+
+
+# This is the first protected route in the app.
+# It requires a valid JWT as an auth header to access it.
+@app.get("/myReviews", response_model=list[ReviewResponse])
+def get_my_reviews(
+    payload: dict = Depends(validate_jwt), db: Session = Depends(get_db)
+):
+    """
+    Get all the reviews by the user.
+
+    Returns:
+        list: A list of all reviews by the user.
+    """
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+    reviews = db.query(Review).filter(Review.User == user_id).all()
+    if not reviews:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No reviews found."
+        )
+
+    return reviews
 
 
 # TODO: We might need to start only allowing these requests to go through
