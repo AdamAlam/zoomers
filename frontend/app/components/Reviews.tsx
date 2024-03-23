@@ -4,8 +4,53 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Review } from '@/app/review.types';
 
+function HalfStarIcon() {
+  return (
+    <div className="relative h-5 w-5 flex-shrink-0">
+      <StarIcon
+        className="absolute left-0 top-0 h-5 w-5 text-yellow-400"
+        aria-hidden="true"
+      />
+      <div style={{ clipPath: 'inset(0 0 0 50%)' }}>
+        <StarIcon className="h-5 w-5 text-gray-300" aria-hidden="true" />
+      </div>
+    </div>
+  );
+}
+
 export default function Reviews({ params }: { params: { movieId: string } }) {
   const [reviews, setReviews] = useState<Review[]>([]);
+
+  const generateStars = (rating: number) => {
+    const stars = [];
+    for (let i = 0; i < 5; i++) {
+      if (rating > i) {
+        if (rating < i + 1) {
+          // Half star
+          stars.push(<HalfStarIcon key={i} />);
+        } else {
+          // Full star
+          stars.push(
+            <StarIcon
+              key={i}
+              className="h-5 w-5 flex-shrink-0 text-yellow-400"
+              aria-hidden="true"
+            />
+          );
+        }
+      } else {
+        // Empty star
+        stars.push(
+          <StarIcon
+            key={i}
+            className="h-5 w-5 flex-shrink-0 text-gray-300"
+            aria-hidden="true"
+          />
+        );
+      }
+    }
+    return stars;
+  };
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -66,31 +111,7 @@ export default function Reviews({ params }: { params: { movieId: string } }) {
                   </time>
                 </p>
                 <div className="mt-4 flex items-center">
-                  {[0, 1, 2, 3, 4].map(rating => (
-                    <div key={rating} className="relative">
-                      <StarIcon
-                        className={cn(
-                          review.stars > rating
-                            ? 'text-yellow-400'
-                            : 'text-gray-300',
-                          'h-5 w-5 flex-shrink-0'
-                        )}
-                        aria-hidden="true"
-                      />
-                      {review.stars > rating && review.stars < rating + 1 && (
-                        <StarIcon
-                          className="absolute left-0 top-0 h-5 w-5 flex-shrink-0"
-                          style={{
-                            // This style is to clip the star to display only a percentage of it
-                            clipPath: 'inset(0 0 0 50%)',
-                            // This is the RGB color equivalent of text-gray-300
-                            color: 'rgb(209 213 219)'
-                          }}
-                          aria-hidden="true"
-                        />
-                      )}
-                    </div>
-                  ))}
+                  {generateStars(review.stars)}
                 </div>
                 {/* For screen reader */}
                 <p className="sr-only">{review.stars} out of 5 stars</p>
