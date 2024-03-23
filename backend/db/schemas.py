@@ -75,5 +75,4 @@ class UserCreate(BaseModel):
 
 
 class FollowCreate(BaseModel):
-    followerId: int
-    followedId: int
+    idToFollow: int

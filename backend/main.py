@@ -416,7 +416,11 @@ def get_my_reviews(
 # TODO: We might need to start only allowing these requests to go through
 #  if the JWT is valid and the user is authenticated.
 @app.post("/follow/", status_code=status.HTTP_201_CREATED)
-def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
+def create_follow(
+    follow: FollowCreate,
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+):
     """
     Create a new follow relationship between two users.
 
@@ -430,11 +434,18 @@ def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
     Raises:
         HTTPException: If the follow relationship already exists or if there is an internal server error.
     """
+
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+
     existing_follow = (
         db.query(Follow)
         .filter(
-            Follow.followerId == follow.followerId,
-            Follow.followedId == follow.followedId,
+            Follow.followerId == user_id,
+            Follow.followedId == follow.idToFollow,
         )
         .first()
     )
@@ -445,7 +456,7 @@ def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
             detail="You already follow this user.",
         )
 
-    db_follow = Follow(followerId=follow.followerId, followedId=follow.followedId)
+    db_follow = Follow(followerId=user_id, followedId=follow.idToFollow)
     db.add(db_follow)
     try:
         db.commit()
