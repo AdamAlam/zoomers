@@ -4,19 +4,17 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Review } from '@/app/review.types';
 
-function HalfStarIcon() {
-  return (
-    <div className="relative h-5 w-5 flex-shrink-0">
-      <StarIcon
-        className="absolute left-0 top-0 h-5 w-5 text-yellow-400"
-        aria-hidden="true"
-      />
-      <div style={{ clipPath: 'inset(0 0 0 50%)' }}>
-        <StarIcon className="h-5 w-5 text-gray-300" aria-hidden="true" />
-      </div>
+const HalfStarIcon = () => (
+  <div className="relative h-5 w-5 flex-shrink-0">
+    <StarIcon
+      className="absolute left-0 top-0 h-5 w-5 text-yellow-400"
+      aria-hidden="true"
+    />
+    <div style={{ clipPath: 'inset(0 0 0 50%)' }}>
+      <StarIcon className="h-5 w-5 text-gray-300" aria-hidden="true" />
     </div>
-  );
-}
+  </div>
+);
 
 export default function Reviews({ params }: { params: { movieId: string } }) {
   const [reviews, setReviews] = useState<Review[]>([]);
