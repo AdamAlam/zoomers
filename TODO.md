@@ -19,11 +19,11 @@
   - [ ] Get all reviews of followed users
   - [ ] Get all of own reviews
   - [x] Get all reviews of specific movie/tv show
-  - [ ] Create backend route to get the average rating for a movie/tv show
-  - [ ] Create validation function that accepts JWT and validates users
+  - [x] Create backend route to get the average rating for a movie/tv show
+  - [x] Create validation function that accepts JWT and validates users
 
 ## Misc
 
-- [ ] Determine which user is logged in after auth. We should consider not using OAuth for now so that we have more control over user auth
+- [] Determine which user is logged in after auth. We should consider not using OAuth for now so that we have more control over user auth
 - [ ] Integrate ESLint into project for better standardization.
 - [ ] Create TS Docs and Python Docstrings for all functions
