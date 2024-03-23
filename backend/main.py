@@ -185,34 +185,46 @@ async def get_all_reviews(db: Session = Depends(get_db)):
 
 
 @app.post("/reviews/", response_model=ReviewResponse)
-async def create_review(review_data: ReviewCreate, db: Session = Depends(get_db)):
+async def create_review(
+    review_data: ReviewCreate,
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+):
     """
-    Create a new review in the database.
+    Create a new review.
 
     Args:
-        review_data (ReviewCreate): The review data to create.
-        db (Session): SQLAlchemy database session.
-
-    Raises:
-        HTTPException: If the review already exists.
+        review_data (ReviewCreate): The data for the new review.
+        payload (dict): The payload from the JWT token.
+        db (Session): The database session.
 
     Returns:
-        ReviewResponse: The created review data.
+        Review: The newly created review.
+
+    Raises:
+        HTTPException: If the user ID is not found or if a review already exists for the user and media.
     """
+    # TODO: This chunch of code is repeated in multiple places. Refactor it into a function.
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+
     existing_review = (
         db.query(Review)
-        .filter(Review.User == review_data.User, Review.MediaId == review_data.MediaId)
+        .filter(Review.User == user_id, Review.MediaId == review_data.MediaId)
         .first()
     )
 
     if existing_review:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"A review by user {review_data.User} for media {review_data.MediaId} already exists.",
+            detail=f"A review by user {user_id} for media {review_data.MediaId} already exists.",
         )
 
     new_review = Review(
-        User=review_data.User,
+        User=user_id,
         stars=review_data.stars,
         ReviewText=review_data.ReviewText,
         MediaId=review_data.MediaId,

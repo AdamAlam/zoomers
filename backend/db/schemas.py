@@ -32,7 +32,6 @@ class ReviewSchema(BaseModel):
 
 
 class ReviewCreate(BaseModel):
-    User: int
     stars: float
     ReviewText: str
     MediaId: int
