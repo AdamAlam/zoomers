@@ -82,7 +82,10 @@ export default function Reviews({ params }: { params: { movieId: string } }) {
             >
               <div className="flex-none py-10">
                 <Image
-                  src="https://images.unsplash.com/photo-1551963831-b3b1ca40c98e"
+                  src={
+                    review.ProfilePictureUrl ||
+                    'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e'
+                  }
                   alt="reviewer avatar"
                   className="h-10 w-10 rounded-full bg-gray-100"
                   width={40}

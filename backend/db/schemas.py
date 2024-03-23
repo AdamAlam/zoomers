@@ -57,6 +57,8 @@ class ReviewByMediaResponse(BaseModel):
     Date: datetime
     MediaId: int
     DisplayName: str
+    # TODO: 'None' used for null check. Should we default a profile picture when a user a created? Then we don't need the 'None'.
+    ProfilePictureUrl: str | None
 
     class Config:
         orm_mode = True
