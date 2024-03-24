@@ -78,7 +78,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
           updateReviews();
         }
       })
-      .catch(err => {
+      .catch(_ => {
         toast({
           variant: 'destructive',
           title: 'Error',
