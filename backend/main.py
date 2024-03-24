@@ -185,34 +185,46 @@ async def get_all_reviews(db: Session = Depends(get_db)):
 
 
 @app.post("/reviews/", response_model=ReviewResponse)
-async def create_review(review_data: ReviewCreate, db: Session = Depends(get_db)):
+async def create_review(
+    review_data: ReviewCreate,
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+):
     """
-    Create a new review in the database.
+    Create a new review.
 
     Args:
-        review_data (ReviewCreate): The review data to create.
-        db (Session): SQLAlchemy database session.
-
-    Raises:
-        HTTPException: If the review already exists.
+        review_data (ReviewCreate): The data for the new review.
+        payload (dict): The payload from the JWT token.
+        db (Session): The database session.
 
     Returns:
-        ReviewResponse: The created review data.
+        Review: The newly created review.
+
+    Raises:
+        HTTPException: If the user ID is not found or if a review already exists for the user and media.
     """
+    # TODO: This chunch of code is repeated in multiple places. Refactor it into a function.
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+
     existing_review = (
         db.query(Review)
-        .filter(Review.User == review_data.User, Review.MediaId == review_data.MediaId)
+        .filter(Review.User == user_id, Review.MediaId == review_data.MediaId)
         .first()
     )
 
     if existing_review:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"A review by user {review_data.User} for media {review_data.MediaId} already exists.",
+            detail=f"A review by user {user_id} for media {review_data.MediaId} already exists.",
         )
 
     new_review = Review(
-        User=review_data.User,
+        User=user_id,
         stars=review_data.stars,
         ReviewText=review_data.ReviewText,
         MediaId=review_data.MediaId,
@@ -415,28 +427,38 @@ def get_my_reviews(
     return reviews
 
 
-# TODO: We might need to start only allowing these requests to go through
-#  if the JWT is valid and the user is authenticated.
 @app.post("/follow/", status_code=status.HTTP_201_CREATED)
-def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
+def create_follow(
+    follow: FollowCreate,
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+):
     """
     Create a new follow relationship between two users.
 
     Args:
-        follow (FollowCreate): The follow relationship to be created.
-        db (Session, optional): The database session. Defaults to Depends(get_db).
+        follow (FollowCreate): The follow object containing the ID of the user to follow.
+        payload (dict): The payload extracted from the JWT token.
+        db (Session): The database session.
 
     Returns:
-        dict: A dictionary containing a success message.
+        dict: A json object with a success message if the follow operation is successful.
 
     Raises:
-        HTTPException: If the follow relationship already exists or if there is an internal server error.
+        HTTPException: If the user ID is not found or if the user is already being followed.
+        HTTPException: If there is an internal server error during the database operation.
     """
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+
     existing_follow = (
         db.query(Follow)
         .filter(
-            Follow.followerId == follow.followerId,
-            Follow.followedId == follow.followedId,
+            Follow.followerId == user_id,
+            Follow.followedId == follow.idToFollow,
         )
         .first()
     )
@@ -447,7 +469,7 @@ def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
             detail="You already follow this user.",
         )
 
-    db_follow = Follow(followerId=follow.followerId, followedId=follow.followedId)
+    db_follow = Follow(followerId=user_id, followedId=follow.idToFollow)
     db.add(db_follow)
     try:
         db.commit()
@@ -460,27 +482,31 @@ def create_follow(follow: FollowCreate, db: Session = Depends(get_db)):
     return {"message": "Follow successful"}
 
 
-# TODO: We might need to start only allowing these requests to go through
-#  if the JWT is valid and the user is authenticated.
 @app.delete("/unfollow/", status_code=status.HTTP_200_OK)
-def unfollow_user(followerId: int, followedId: int, db: Session = Depends(get_db)):
+def unfollow_user(
+    followedId: int,
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+):
     """
     Unfollows a user by deleting the follow relationship from the database.
 
     Args:
-        followerId (int): The ID of the follower user.
-        followedId (int): The ID of the user being followed.
-        db (Session, optional): The database session. Defaults to Depends(get_db).
-
+        followedId (int): The ID of the user to unfollow.
+        payload (dict, optional): The payload containing the user ID. Required for unfollowing.
+        db (Session, optional): The database session.
     Returns:
-        dict: A dictionary containing a success message.
-
-    Raises:
-        HTTPException: If the follow relationship does not exist or if there is an internal server error.
+        dict: An object with a message indicating the unfollow was successful.
     """
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+
     follow_relationship = (
         db.query(Follow)
-        .filter(Follow.followerId == followerId, Follow.followedId == followedId)
+        .filter(Follow.followerId == user_id, Follow.followedId == followedId)
         .first()
     )
 

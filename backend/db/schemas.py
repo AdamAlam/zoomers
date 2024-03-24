@@ -32,7 +32,6 @@ class ReviewSchema(BaseModel):
 
 
 class ReviewCreate(BaseModel):
-    User: int
     stars: float
     ReviewText: str
     MediaId: int
@@ -77,5 +76,4 @@ class UserCreate(BaseModel):
 
 
 class FollowCreate(BaseModel):
-    followerId: int
-    followedId: int
+    idToFollow: int

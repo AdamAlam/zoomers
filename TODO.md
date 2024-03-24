@@ -19,8 +19,8 @@
   - [ ] Get all reviews of followed users
   - [ ] Get all of own reviews
   - [x] Get all reviews of specific movie/tv show
-  - [ ] Create backend route to get the average rating for a movie/tv show
-  - [ ] Create validation function that accepts JWT and validates users
+  - [x] Create backend route to get the average rating for a movie/tv show
+  - [x] Create validation function that accepts JWT and validates users
 
 ## Misc
 
