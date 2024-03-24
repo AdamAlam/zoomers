@@ -262,6 +262,7 @@ async def get_reviews_by_media_id(media_id: int, db: Session = Depends(get_db)):
             Review.Date,
             Review.MediaId,
             User.DisplayName,
+            User.ProfilePictureUrl
         )
         .join(User, Review.User == User.id)
         .filter(Review.MediaId == media_id)
@@ -276,6 +277,7 @@ async def get_reviews_by_media_id(media_id: int, db: Session = Depends(get_db)):
             Date=review.Date,
             MediaId=review.MediaId,
             DisplayName=review.DisplayName,
+            ProfilePictureUrl=review.ProfilePictureUrl
         )
         for review in db_response
     ]

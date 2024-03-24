@@ -24,6 +24,6 @@
 
 ## Misc
 
-- [] Determine which user is logged in after auth. We should consider not using OAuth for now so that we have more control over user auth
+- [ ] Determine which user is logged in after auth. We should consider not using OAuth for now so that we have more control over user auth
 - [ ] Integrate ESLint into project for better standardization.
 - [ ] Create TS Docs and Python Docstrings for all functions

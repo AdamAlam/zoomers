@@ -5,4 +5,5 @@ export interface Review {
   MediaId: number;
   Date: string;
   DisplayName: string;
+  ProfilePictureUrl: string;
 }
