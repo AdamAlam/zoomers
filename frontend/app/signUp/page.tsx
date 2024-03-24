@@ -6,7 +6,7 @@ import { cn } from '../utils/cn';
 import {
   IconBrandGithub,
   IconBrandGoogle,
-  IconBrandOnlyfans
+  IconBrandOnlyfans,
 } from '@tabler/icons-react';
 import { supabase } from '../lib/supabase/supabaseClient';
 import { Provider } from '@supabase/supabase-js';
@@ -31,11 +31,11 @@ const SignUp = () => {
       password: z
         .string()
         .min(6, 'Password must be at least 6 characters long'),
-      passwordConfirm: z.string().min(6, 'Password confirmation is required')
+      passwordConfirm: z.string().min(6, 'Password confirmation is required'),
     })
-    .refine(data => data.password === data.passwordConfirm, {
+    .refine((data) => data.password === data.passwordConfirm, {
       message: "Passwords don't match",
-      path: ['passwordConfirm']
+      path: ['passwordConfirm'],
     });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -49,7 +49,7 @@ const SignUp = () => {
       displayName: formData.get('displayName') as string,
       username: formData.get('username') as string,
       password: formData.get('password') as string,
-      passwordConfirm: formData.get('passwordConfirm') as string
+      passwordConfirm: formData.get('passwordConfirm') as string,
     };
 
     try {
@@ -61,14 +61,14 @@ const SignUp = () => {
           Email: formValues.email,
           DisplayName: formValues.displayName,
           Username: formValues.username,
-          Password: formValues.password
+          Password: formValues.password,
         })
-        .then(res => {
+        .then((res) => {
           if (res.status === 200) {
             toast({
               title: 'Signup Successful',
               description:
-                "You've successfully signed up! You will be redirected to the login page."
+                "You've successfully signed up! You will be redirected to the login page.",
             });
             setTimeout(() => {
               router.push('/login');
@@ -84,7 +84,7 @@ const SignUp = () => {
 
   const handleOAuthLogin = async (provider: Provider) => {
     await supabase.auth.signInWithOAuth({
-      provider: provider
+      provider: provider,
     });
   };
 
@@ -229,7 +229,7 @@ const BottomGradient = () => {
 
 const LabelInputContainer = ({
   children,
-  className
+  className,
 }: {
   children: React.ReactNode;
   className?: string;

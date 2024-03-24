@@ -5,7 +5,7 @@ import {
   MobileMenuDialog,
   DialogContent,
   DialogDescription,
-  DialogHeader
+  DialogHeader,
 } from '@/components/ui/mobile-menu-dialog';
 
 import { Bars3Icon, FilmIcon } from '@heroicons/react/24/outline';
@@ -36,7 +36,7 @@ const NavigationItem = ({ item, mobile = false }: Props) => {
 
 const MobileMenu = ({
   isOpen,
-  onClose
+  onClose,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -49,7 +49,7 @@ const MobileMenu = ({
             <div className="mt-6 flow-root">
               <div className="-my-6 divide-y divide-gray-500/10">
                 <div className="space-y-2 py-6">
-                  {navigationItems.map(item => (
+                  {navigationItems.map((item) => (
                     <NavigationItem key={item.name} item={item} mobile />
                   ))}
                 </div>
@@ -88,7 +88,7 @@ export default function Navigation() {
           </Link>
         </div>
         <div className="hidden lg:flex lg:gap-x-12">
-          {navigationItems.map(item => (
+          {navigationItems.map((item) => (
             <NavigationItem key={item.name} item={item} />
           ))}
         </div>

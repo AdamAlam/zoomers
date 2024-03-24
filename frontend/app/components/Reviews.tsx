@@ -33,7 +33,7 @@ export default function Reviews({ params }: { params: { movieId: string } }) {
               key={i}
               className="h-5 w-5 flex-shrink-0 text-yellow-400"
               aria-hidden="true"
-            />
+            />,
           );
         }
       } else {
@@ -43,7 +43,7 @@ export default function Reviews({ params }: { params: { movieId: string } }) {
             key={i}
             className="h-5 w-5 flex-shrink-0 text-gray-300"
             aria-hidden="true"
-          />
+          />,
         );
       }
     }
@@ -63,8 +63,8 @@ export default function Reviews({ params }: { params: { movieId: string } }) {
   useEffect(() => {
     if (params.movieId !== undefined) {
       fetch(`http://localhost:8000/reviews/${params.movieId}`)
-        .then(res => res.json())
-        .then(data => setReviews(data));
+        .then((res) => res.json())
+        .then((data) => setReviews(data));
     }
   }, [params.movieId]);
 
@@ -89,7 +89,7 @@ export default function Reviews({ params }: { params: { movieId: string } }) {
             <div
               className={cn(
                 reviewIdx === 0 ? '' : 'border-t border-gray-200',
-                'flex-1 py-10'
+                'flex-1 py-10',
               )}
             >
               <h3 className="font-medium text-gray-900">
@@ -103,7 +103,7 @@ export default function Reviews({ params }: { params: { movieId: string } }) {
                     day: 'numeric',
                     hour: 'numeric',
                     minute: 'numeric',
-                    timeZoneName: 'short'
+                    timeZoneName: 'short',
                   })}
                 </time>
               </p>
