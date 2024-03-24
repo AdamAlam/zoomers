@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Rating } from 'react-simple-star-rating';
 import { Movie } from '../../movie.types';
-import Reviews from '@/app/components/Reviews';
+import Reviews from '@/app/components/reviews';
 interface FormData {
   reviewText: string;
   stars: number;
@@ -27,7 +27,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
     reviewText: '',
     stars: 2.5,
     mediaId: params.movieId,
-    user: 1
+    user: 1,
   });
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,16 +37,16 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
   // TODO: Figure out what to do with this
   const updateReviews = () => {
     fetch(`http://localhost:8000/reviews/${params.movieId}`)
-      .then(res => res.json())
-      .then(data => setReviews(data));
+      .then((res) => res.json())
+      .then((data) => setReviews(data));
   };
 
   // Get movie details
   useEffect(() => {
     if (params.movieId !== undefined) {
       fetch(`http://localhost:8000/movie/${params.movieId}}`)
-        .then(res => res.json())
-        .then(data => setMovieDetails(data));
+        .then((res) => res.json())
+        .then((data) => setMovieDetails(data));
     }
   }, [params.movieId]);
 
@@ -54,8 +54,8 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
   useEffect(() => {
     if (params.movieId !== undefined) {
       fetch(`http://localhost:8000/reviews/${params.movieId}`)
-        .then(res => res.json())
-        .then(data => setReviews(data));
+        .then((res) => res.json())
+        .then((data) => setReviews(data));
     }
   }, [params.movieId]);
 
@@ -67,24 +67,24 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
         stars: formData.stars,
         ReviewText: formData.reviewText || '',
         // TODO: I am using a random user id from the DB just for review variety.
-        User: Math.floor(Math.random() * (327 - 128 + 1)) + 128
+        User: Math.floor(Math.random() * (327 - 128 + 1)) + 128,
       })
-      .then(res => {
+      .then((res) => {
         if (res.status === 200) {
           toast({
             title: 'Review Submitted',
             description: `Your review for ${movieDetails?.title} been submitted`,
-            duration: 5000
+            duration: 5000,
           });
           updateReviews();
         }
       })
-      .catch(err => {
+      .catch((err) => {
         toast({
           variant: 'destructive',
           title: 'Error',
           description:
-            'There was an error submitting your review. You may have already submitted a review for this film.'
+            'There was an error submitting your review. You may have already submitted a review for this film.',
         });
       });
   };
@@ -129,7 +129,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
                 <CardTitle>Add A Review</CardTitle>
                 <Rating
                   initialValue={formData.stars}
-                  onClick={rate => setFormData({ ...formData, stars: rate })}
+                  onClick={(rate) => setFormData({ ...formData, stars: rate })}
                   allowFraction
                   size={30}
                   SVGclassName="inline-block"
