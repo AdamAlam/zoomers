@@ -29,7 +29,6 @@ const Login = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { email, password } = formData;
-    console.log(email, password);
     axios
       .post(
         'http://localhost:8000/login',
@@ -58,7 +57,6 @@ const Login = () => {
       .catch(err => {
         setLoginError(true);
         if (err.response.status === 401) {
-          console.log('Hallo');
           toast({
             title: 'Login Error',
             description: 'Invalid email or password',
@@ -67,7 +65,6 @@ const Login = () => {
           });
         }
         if (err.response.status === 404) {
-          console.log('Hallo2');
           toast({
             title: 'Email not found',
             description: 'This email is not registered.',

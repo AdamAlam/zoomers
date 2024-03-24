@@ -158,7 +158,6 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
           {reviews.length > 0 && (
             <ReviewStack
               reviews={reviews.map(review => {
-                console.log(review);
                 return {
                   id: review.id,
                   name: `${review.DisplayName} - ${review.stars}/5 Stars`,
