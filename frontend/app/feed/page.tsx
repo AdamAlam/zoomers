@@ -19,6 +19,7 @@ const Feed = (props: Props) => {
         <div className="grid grid-cols-5">
           <div className="border-2 border-red-700">
             <img src="https://via.placeholder.com/150" alt="movie" />
+            {/* // TODO:  Might want to make this its own component */}
             {/* Review author at bottom of image */}
             {/* Number of stars on bottom left */}
             {/* Date on bottom right */}
