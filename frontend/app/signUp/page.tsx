@@ -1,20 +1,20 @@
 'use client';
-import React, { useState } from 'react';
-import { Label } from './../components/ui/label';
-import { Input } from './../components/ui/input';
-import { cn } from '../utils/cn';
+import { useToast } from '@/components/ui/use-toast';
+import { Provider } from '@supabase/supabase-js';
 import {
   IconBrandGithub,
   IconBrandGoogle,
   IconBrandOnlyfans
 } from '@tabler/icons-react';
-import { supabase } from '../lib/supabase/supabaseClient';
-import { Provider } from '@supabase/supabase-js';
-import { useToast } from '@/components/ui/use-toast';
-import { z } from 'zod';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { Router } from 'lucide-react';
+import React, { useState } from 'react';
+import { z } from 'zod';
+import { supabase } from '../lib/supabase/supabaseClient';
+import { cn } from '../utils/cn';
+import { Input } from './../components/ui/input';
+import { Label } from './../components/ui/label';
+
 const SignUp = () => {
   const { toast } = useToast();
   const router = useRouter();
