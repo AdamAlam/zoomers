@@ -229,7 +229,7 @@ def search_media(query: str, payload: dict = Depends(validate_jwt)):
     Returns:
         dict: The JSON response containing the search results.
     """
-    url = f"https://api.themoviedb.org/3/search/tv?query={query}&include_adult=false&language=en-US&page=1"
+    url = f"https://api.themoviedb.org/3/search/multi?query={query}&include_adult=false&language=en-US&page=1"
 
     headers = {
         "accept": "application/json",
