@@ -1,1 +1,1 @@
-disable = C0114
+disable = C0114, C0301
