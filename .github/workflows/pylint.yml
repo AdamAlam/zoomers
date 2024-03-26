@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10"]
+        python-version: ["3.8", "3.9", "3.10"]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -22,6 +22,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pylint
+      working-directory: ./backend
     - name: Analysing the code with pylint
-      run: |
-        pylint $(find ./backend -type f -name '*.py')
+      run: pylint $(find . -type f -name '*.py')
+      working-directory: ./backend
