@@ -169,6 +169,78 @@ async def get_popular_shows(page: Optional[str] = 1):
     return response.json()
 
 
+@app.get("/search/movies/{query}")
+def search_movies(query: str, payload: dict = Depends(validate_jwt)):
+    """
+    Search for movie using the provided query.
+
+    Args:
+        query (str): The search query.
+        payload (dict): The payload containing the JWT token.
+
+    Returns:
+        dict: The JSON response containing the search results.
+    """
+    url = f"https://api.themoviedb.org/3/search/movie?query={query}&include_adult=false&language=en-US&page=1"
+
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {settings.TMDB_BEARER}",
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
+
+    return response.json()
+
+
+@app.get("/search/tv/{query}")
+def search_tv_shows(query: str, payload: dict = Depends(validate_jwt)):
+    """
+    Search for tv show using the provided query.
+
+    Args:
+        query (str): The search query.
+        payload (dict): The payload containing the JWT token.
+
+    Returns:
+        dict: The JSON response containing the search results.
+    """
+    url = f"https://api.themoviedb.org/3/search/tv?query={query}&include_adult=false&language=en-US&page=1"
+
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {settings.TMDB_BEARER}",
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
+
+    return response.json()
+
+
+@app.get("/search/all/{query}")
+def search_media(query: str, payload: dict = Depends(validate_jwt)):
+    """
+    Search for media using the provided query.
+
+    Args:
+        query (str): The search query.
+        payload (dict): The payload containing the JWT token.
+
+    Returns:
+        dict: The JSON response containing the search results.
+    """
+    url = f"https://api.themoviedb.org/3/search/tv?query={query}&include_adult=false&language=en-US&page=1"
+
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {settings.TMDB_BEARER}",
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
+
+    return response.json()
+
+
 @app.get("/allReviews/")
 async def get_all_reviews(db: Session = Depends(get_db)):
     """
@@ -262,7 +334,7 @@ async def get_reviews_by_media_id(media_id: int, db: Session = Depends(get_db)):
             Review.Date,
             Review.MediaId,
             User.DisplayName,
-            User.ProfilePictureUrl
+            User.ProfilePictureUrl,
         )
         .join(User, Review.User == User.id)
         .filter(Review.MediaId == media_id)
@@ -277,7 +349,7 @@ async def get_reviews_by_media_id(media_id: int, db: Session = Depends(get_db)):
             Date=review.Date,
             MediaId=review.MediaId,
             DisplayName=review.DisplayName,
-            ProfilePictureUrl=review.ProfilePictureUrl
+            ProfilePictureUrl=review.ProfilePictureUrl,
         )
         for review in db_response
     ]
