@@ -19,7 +19,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from util.auth import generate_jwt, validate_jwt
-from db.base_class import Base
 
 
 def create_tables():
@@ -143,7 +142,6 @@ async def get_popular_movies(page: Optional[str] = "1"):
     }
 
     response = requests.get(url, headers=headers, timeout=10)
-
     return response.json()
 
 
