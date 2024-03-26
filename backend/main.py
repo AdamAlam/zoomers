@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from util.auth import generate_jwt, validate_jwt
+from db.base_class import Base
 
 
 def create_tables():
@@ -125,7 +126,7 @@ async def get_show_detail(show_id: str):
 
 
 @app.get("/movies/popular/")
-async def get_popular_movies(page: Optional[str] = 1):
+async def get_popular_movies(page: Optional[str] = "1"):
     """
     Fetch and return a list of popular movies from an external API.
 
@@ -147,7 +148,7 @@ async def get_popular_movies(page: Optional[str] = 1):
 
 
 @app.get("/tvShows/popular/")
-async def get_popular_shows(page: Optional[str] = 1):
+async def get_popular_shows(page: Optional[str] = "1"):
     """
     Fetch and return a list of popular TV shows from an external API.
 
@@ -276,7 +277,7 @@ async def create_review(
     Raises:
         HTTPException: If the user ID is not found or if a review already exists for the user and media.
     """
-    # TODO: This chunch of code is repeated in multiple places. Refactor it into a function.
+    # TODO: This chunk of code is repeated in multiple places. Refactor it into a function.
     user_id = payload.get("user_id")
     if not user_id:
         raise HTTPException(
@@ -310,7 +311,7 @@ async def create_review(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        ) from e
     return new_review
 
 
@@ -402,7 +403,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        ) from e
     return new_user
 
 
@@ -550,7 +551,7 @@ def create_follow(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        ) from e
     return {"message": "Follow successful"}
 
 
@@ -595,7 +596,7 @@ def unfollow_user(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        ) from e
 
     return {"message": "Unfollow successful"}
 
@@ -652,7 +653,7 @@ def add_to_watched(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        ) from e
 
     return {"message": "Media item added to watched list."}
 
@@ -703,6 +704,6 @@ def remove_from_watched(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        ) from e
 
     return {"message": "Removed item from watched list"}
