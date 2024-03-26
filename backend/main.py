@@ -5,7 +5,7 @@ import bcrypt
 import requests
 from core.config import settings
 from db.base_class import Base
-from db.models import Follow, Review, User
+from db.models import Follow, Review, User, Watched
 from db.schemas import (
     FollowCreate,
     ReviewByMediaResponse,
@@ -598,3 +598,111 @@ def unfollow_user(
         )
 
     return {"message": "Unfollow successful"}
+
+
+@app.post("/watched")
+def add_to_watched(
+    media_id: int,
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+):
+    """
+    Add a media item to the user's watched list.
+
+    Parameters:
+    - media_id (int): The ID of the media item to be added.
+    - payload (dict): The payload containing user information obtained from the JWT token.
+    - db (Session): The database session.
+
+    Returns:
+    - dict: A dictionary with a message indicating that the media item has been added to the watched list.
+
+    Raises:
+    - HTTPException: If the user ID is not found or if the media item is already in the watched list.
+    - HTTPException: If there is an internal server error during the database operation.
+    """
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+
+    existing_watched = (
+        db.query(Watched)
+        .filter(Watched.user_id == user_id, Watched.media_id == media_id)
+        .first()
+    )
+    if existing_watched:
+        raise HTTPException(
+            status_code=status.HTTP_400_NOT_FOUND,
+            detail="This item is already in your watched list.",
+        )
+
+    new_watch = Watched(
+        user_id=user_id,
+        media_id=media_id,
+        created_at=datetime.datetime.now(datetime.UTC),
+    )
+    db.add(new_watch)
+
+    try:
+        db.commit()
+        db.refresh(new_watch)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
+
+    return {"message": "Media item added to watched list."}
+
+
+@app.delete("/watched")
+def remove_from_watched(
+    media_id: int,
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+):
+    """
+    Remove an item from the user's watched list.
+
+    Args:
+        media_id (int): The ID of the media item to be removed.
+        payload (dict): The payload containing user information obtained from the JWT.
+        db (Session): The database session.
+
+    Returns:
+        dict: A dictionary with a message indicating that the item has been removed from the watched list.
+
+    Raises:
+        HTTPException: If the user ID is not found or if the item is not found in the user's watched list.
+        HTTPException: If there is an error while deleting the item from the database.
+    """
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+
+    watched_item = (
+        db.query(Watched)
+        .filter(Watched.user_id == user_id, Watched.media_id == media_id)
+        .first()
+    )
+
+    if not watched_item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The user does not have this item in their watched list.",
+        )
+
+    try:
+        db.delete(watched_item)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
+
+    return {"message": "Removed item from watched list"}

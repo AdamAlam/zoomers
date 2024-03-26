@@ -36,3 +36,11 @@ class Review(Base):
     ReviewText = Column(String)
     Date = Column(TIMESTAMP)
     MediaId = Column(Integer)
+
+
+class Watched(Base):
+    __tablename__ = "Watched"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("User.id"))
+    media_id = Column(Integer)
+    created_at = Column(TIMESTAMP)
