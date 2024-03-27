@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'backend/**'
+      - 'backend/**/*.py'
       
 jobs:
   flake8_py3:
