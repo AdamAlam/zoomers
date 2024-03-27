@@ -482,7 +482,7 @@ def get_my_reviews(
             status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
         )
     reviews = (
-        db.query(Review, User.ProfilePictureUrl)
+        db.query(Review, User.DisplayName, User.ProfilePictureUrl)
         .join(User, Review.User == User.id)
         .filter(Review.User == user_id)
         .all()
@@ -500,9 +500,10 @@ def get_my_reviews(
             "ReviewText": review.ReviewText,
             "Date": review.Date,
             "MediaId": review.MediaId,
+            "DisplayName": display_name,
             "ProfilePictureUrl": profile_picture_url,
         }
-        for review, profile_picture_url in reviews
+        for review, display_name, profile_picture_url in reviews
     ]
 
     return response

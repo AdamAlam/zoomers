@@ -61,6 +61,7 @@ class ReviewResponse(BaseModel):
     Date: datetime
     MediaId: int
     ProfilePictureUrl: str
+    DisplayName: str
 
     class Config:
         orm_mode = True

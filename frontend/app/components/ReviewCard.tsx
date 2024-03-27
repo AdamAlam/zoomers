@@ -28,12 +28,13 @@ const ReviewCard = ({ review }: Props) => {
           alt={`${movieData?.title} poster`}
           className="rounded-t-sm"
         />
-        <div className="rounded-b-sm bg-slate-300 p-1">
+        <div className="flex rounded-b-sm bg-slate-300 p-1">
           <Image
             src={review.ProfilePictureUrl}
             height={20}
             width={20}
             alt="profile"
+            className="mr-1 self-center rounded-full border border-slate-500"
           />
           <p className="font-semibold">{review.DisplayName || 'Anonymous'}</p>
         </div>
