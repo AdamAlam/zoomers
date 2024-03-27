@@ -1,3 +1,9 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@radix-ui/react-tooltip';
 import axios from 'axios';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
@@ -5,13 +11,6 @@ import { Movie } from '../movie.types';
 import { Review } from '../review.types';
 import { generateStars } from '../utils/generateStars';
 import { transformTimestamp } from '../utils/tranformUTCTimestamp';
-import { Button } from '@/components/ui/button';
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent
-} from '@radix-ui/react-tooltip';
 
 interface Props {
   review: Review;
