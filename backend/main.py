@@ -697,8 +697,3 @@ def remove_from_watched(
         ) from e
 
     return {"message": "Removed item from watched list"}
-
-
-@app.get("/test")
-def test():
-    return {"msg": "Hello World!"}
