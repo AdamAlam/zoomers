@@ -11,5 +11,5 @@ class Base:
 
     # to generate tablename from classname
     @declared_attr
-    def __tablename__(self, cls) -> str:
+    def __tablename__(self, cls) -> Mapped[str]:
         return cls.__name__.lower()
