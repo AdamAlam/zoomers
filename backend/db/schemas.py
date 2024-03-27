@@ -60,8 +60,8 @@ class ReviewResponse(BaseModel):
     ReviewText: str
     Date: datetime
     MediaId: int
-    ProfilePictureUrl: str
-    DisplayName: str
+    ProfilePictureUrl: Optional[str] = None
+    DisplayName: Optional[str] = None
 
     class Config:
         orm_mode = True

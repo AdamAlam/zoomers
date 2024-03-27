@@ -291,7 +291,7 @@ async def create_review(
         stars=review_data.stars,
         ReviewText=review_data.ReviewText,
         MediaId=review_data.MediaId,
-        Date=datetime.datetime.now(datetime.timezone.utc),
+        Date=datetime.datetime.now(datetime.UTC),
     )
     db.add(new_review)
     try:
