@@ -4,7 +4,6 @@ from typing import Optional
 import bcrypt
 import requests
 from core.config import settings
-from db.base_class import Base
 from db.models import Follow, Review, User, Watched
 from db.schemas import (
     FollowCreate,
@@ -13,18 +12,12 @@ from db.schemas import (
     ReviewResponse,
     UserCreate,
 )
-from db.session import SessionLocal, engine
+from db.session import SessionLocal
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from util.auth import generate_jwt, validate_jwt
-
-
-def create_tables():
-    """Create database tables based on SQLAlchemy models."""
-    Base.metadata.create_all(bind=engine)
-
 
 origins = ["http://localhost:3000"]
 
@@ -53,7 +46,6 @@ def start_application() -> FastAPI:
         FastAPI: The configured FastAPI application.
     """
     app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
-    create_tables()
 
     app.add_middleware(
         CORSMiddleware,
