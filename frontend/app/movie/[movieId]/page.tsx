@@ -23,7 +23,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
   const imageUrl = 'https://image.tmdb.org/t/p/original';
   const [formData, setFormData] = useState<FormData>({
     reviewText: '',
-    stars: 3.5,
+    stars: 2.5,
     mediaId: params.movieId
   });
 
