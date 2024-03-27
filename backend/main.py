@@ -481,13 +481,31 @@ def get_my_reviews(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
         )
-    reviews = db.query(Review).filter(Review.User == user_id).all()
+    reviews = (
+        db.query(Review, User.ProfilePictureUrl)
+        .join(User, Review.User == User.id)
+        .filter(Review.User == user_id)
+        .all()
+    )
+
     if not reviews:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="No reviews found."
         )
+    response = [
+        {
+            "id": review.id,
+            "User": review.User,
+            "stars": review.stars,
+            "ReviewText": review.ReviewText,
+            "Date": review.Date,
+            "MediaId": review.MediaId,
+            "ProfilePictureUrl": profile_picture_url,
+        }
+        for review, profile_picture_url in reviews
+    ]
 
-    return reviews
+    return response
 
 
 @app.post("/follow/", status_code=status.HTTP_201_CREATED)
