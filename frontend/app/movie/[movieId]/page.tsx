@@ -27,7 +27,9 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
     mediaId: params.movieId
   });
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
