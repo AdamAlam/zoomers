@@ -5,6 +5,13 @@ import { Movie } from '../movie.types';
 import { Review } from '../review.types';
 import { generateStars } from '../utils/generateStars';
 import { transformTimestamp } from '../utils/tranformUTCTimestamp';
+import { Button } from '@/components/ui/button';
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent
+} from '@radix-ui/react-tooltip';
 
 interface Props {
   review: Review;
@@ -45,7 +52,17 @@ const ReviewCard = ({ review }: Props) => {
       <div className="flex justify-between">
         <div className="flex">{generateStars(review.stars)}</div>
         <div>
-          <p>{transformTimestamp(review.Date)}</p>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p>{transformTimestamp(review.Date)}</p>
+              </TooltipTrigger>
+              <TooltipContent>
+                {/* //TODO: Format this hover to look better and be in the local timezone format: MM-DD-YYYY hh:mm */}
+                <p>{review.Date}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
     </>
