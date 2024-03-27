@@ -13,7 +13,7 @@ from db.schemas import (
     UserCreate,
 )
 from db.session import SessionLocal
-from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -468,7 +468,11 @@ def get_average_rating(media_id: int, db: Session = Depends(get_db)):
 # It requires a valid JWT as an auth header to access it.
 @app.get("/myReviews", response_model=list[ReviewResponse])
 def get_my_reviews(
-    payload: dict = Depends(validate_jwt), db: Session = Depends(get_db)
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+    limit: int = Query(
+        default=None, description="Limit the number of reviews returned."
+    ),
 ):
     """
     Get all the reviews by the user.
@@ -481,12 +485,17 @@ def get_my_reviews(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
         )
-    reviews = (
+    query = (
         db.query(Review, User.DisplayName, User.ProfilePictureUrl)
         .join(User, Review.User == User.id)
         .filter(Review.User == user_id)
-        .all()
+        .order_by(Review.Date.desc())
     )
+
+    if limit:
+        query = query.limit(limit)
+
+    reviews = query.all()
 
     if not reviews:
         raise HTTPException(

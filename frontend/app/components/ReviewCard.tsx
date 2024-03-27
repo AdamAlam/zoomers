@@ -1,10 +1,10 @@
+import axios from 'axios';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { Movie } from '../movie.types';
 import { Review } from '../review.types';
 import { generateStars } from '../utils/generateStars';
 import { transformTimestamp } from '../utils/tranformUTCTimestamp';
-import axios from 'axios';
-import { Movie } from '../movie.types';
-import Image from 'next/image';
 
 interface Props {
   review: Review;
@@ -30,11 +30,14 @@ const ReviewCard = ({ review }: Props) => {
         />
         <div className="flex rounded-b-sm bg-slate-300 p-1">
           <Image
-            src={review.ProfilePictureUrl}
-            height={20}
-            width={20}
+            src={
+              review.ProfilePictureUrl ||
+              'https://avatars.githubusercontent.com/u/75668877'
+            }
             alt="profile"
-            className="mr-1 self-center rounded-full border border-slate-500"
+            className="mr-1 h-[20px] w-[20px] self-center rounded-full border border-slate-500"
+            width={20}
+            height={20}
           />
           <p className="font-semibold">{review.DisplayName || 'Anonymous'}</p>
         </div>

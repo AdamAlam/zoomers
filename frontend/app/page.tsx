@@ -16,8 +16,9 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    // get's the user's 5 most recent reviews
     axios
-      .get('http://localhost:8000/myReviews', {
+      .get('http://localhost:8000/myReviews?limit=5', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
         }

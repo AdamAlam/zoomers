@@ -1,16 +1,16 @@
 'use client';
-import React, { useState } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import {
   IconBrandGithub,
   IconBrandGoogle,
   IconBrandOnlyfans
 } from '@tabler/icons-react';
-import { Label } from '../components/ui/label';
-import { Input } from '../components/ui/input';
-import { cn } from '../utils/cn';
 import axios from 'axios';
-import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { cn } from '../utils/cn';
 
 interface formDataType {
   email: string;

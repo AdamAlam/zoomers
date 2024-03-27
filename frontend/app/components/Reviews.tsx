@@ -1,7 +1,7 @@
+import { Review } from '@/app/review.types';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { Review } from '@/app/review.types';
 import { generateStars } from '../utils/generateStars';
 
 export default function Reviews({ params }: { params: { movieId: string } }) {

@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
 import {
-  MobileMenuDialog,
   DialogContent,
   DialogDescription,
-  DialogHeader
+  DialogHeader,
+  MobileMenuDialog
 } from '@/components/ui/mobile-menu-dialog';
+import { useState } from 'react';
 
 import { Bars3Icon, FilmIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
