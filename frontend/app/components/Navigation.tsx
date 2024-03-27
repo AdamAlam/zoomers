@@ -94,7 +94,7 @@ export default function Navigation() {
         </div>
         <div className="flex flex-1 items-center justify-end gap-x-6">
           <Link
-            href="/logIn"
+            href="/login"
             className="hidden lg:block lg:text-sm lg:font-semibold lg:leading-6 lg:text-gray-900"
           >
             Log in
