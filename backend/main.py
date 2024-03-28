@@ -725,3 +725,64 @@ def remove_from_watched(
         ) from e
 
     return {"message": "Removed item from watched list"}
+
+
+@app.get("/following-reviews", response_model=list[ReviewResponse])
+def get_reviews_of_followed_users(
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+    limit: int = Query(default=10, description="Limit the number of reviews returned."),
+):
+    """
+    Get reviews of users that the current user follows.
+
+    Args:
+        payload (dict): The payload containing the user ID.
+        db (Session): The database session.
+        limit (int, optional): Limit the number of reviews returned.
+
+    Returns:
+        list: A list of reviews by users that the current user follows.
+    """
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+
+    followed_users = (
+        db.query(Follow.followedId).filter(Follow.followerId == user_id).all()
+    )
+
+    followed_user_ids = [user_id for user_id, in followed_users]
+
+    query = (
+        db.query(Review, User.DisplayName, User.ProfilePictureUrl)
+        .join(User, Review.User == User.id)
+        .filter(Review.User.in_(followed_user_ids))
+        .order_by(Review.Date.desc())
+        .limit(max(limit, 20))
+    )
+
+    reviews = query.all()
+
+    if not reviews:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No reviews found."
+        )
+
+    response = [
+        {
+            "id": review.id,
+            "User": review.User,
+            "stars": review.stars,
+            "ReviewText": review.ReviewText,
+            "Date": review.Date,
+            "MediaId": review.MediaId,
+            "DisplayName": display_name,
+            "ProfilePictureUrl": profile_picture_url,
+        }
+        for review, display_name, profile_picture_url in reviews
+    ]
+
+    return response
