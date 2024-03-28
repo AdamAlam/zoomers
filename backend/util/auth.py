@@ -39,7 +39,7 @@ def validate_jwt(token: str = Security(security)):
         bool: True if the JWT is valid, False otherwise.
 
     """
-    credentials: HTTPAuthorizationCredentials = token
+    credentials: HTTPAuthorizationCredentials = token  # type: ignore
     jwt_token = credentials.credentials
     try:
         payload = decode(jwt_token, settings.JWT_SECRET, algorithms=["HS256"])
