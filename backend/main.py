@@ -61,6 +61,27 @@ def start_application() -> FastAPI:
 app = start_application()
 
 
+def get_user_id(payload):
+    """
+    Retrieves the user ID from the payload.
+
+    Args:
+        payload (dict): The payload containing the user ID.
+
+    Returns:
+        str: The user ID.
+
+    Raises:
+        HTTPException: If the user ID is not found in the payload.
+    """
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+    return user_id
+
+
 @app.get("/")
 def home():
     """
@@ -267,12 +288,7 @@ async def create_review(
     Raises:
         HTTPException: If the user ID is not found or if a review already exists for the user and media.
     """
-    # TODO: This chunk of code is repeated in multiple places. Refactor it into a function.
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
+    user_id = get_user_id(payload)
 
     existing_review = (
         db.query(Review)
@@ -480,11 +496,7 @@ def get_my_reviews(
     Returns:
         list: A list of all reviews by the user.
     """
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
+    user_id = get_user_id(payload)
     query = (
         db.query(Review, User.DisplayName, User.ProfilePictureUrl)
         .join(User, Review.User == User.id)
@@ -539,11 +551,7 @@ def create_follow(
         HTTPException: If the user ID is not found or if the user is already being followed.
         HTTPException: If there is an internal server error during the database operation.
     """
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
+    user_id = get_user_id(payload)
 
     existing_follow = (
         db.query(Follow)
@@ -589,11 +597,7 @@ def unfollow_user(
     Returns:
         dict: An object with a message indicating the unfollow was successful.
     """
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
+    user_id = get_user_id(payload)
 
     follow_relationship = (
         db.query(Follow)
@@ -640,11 +644,7 @@ def add_to_watched(
     - HTTPException: If the user ID is not found or if the media item is already in the watched list.
     - HTTPException: If there is an internal server error during the database operation.
     """
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
+    user_id = get_user_id(payload)
 
     existing_watched = (
         db.query(Watched)
@@ -697,11 +697,7 @@ def remove_from_watched(
         HTTPException: If the user ID is not found or if the item is not found in the user's watched list.
         HTTPException: If there is an error while deleting the item from the database.
     """
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
+    user_id = get_user_id(payload)
 
     watched_item = (
         db.query(Watched)
@@ -744,11 +740,7 @@ def get_reviews_of_followed_users(
     Returns:
         list: A list of reviews by users that the current user follows.
     """
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
+    user_id = get_user_id(payload)
 
     followed_users = (
         db.query(Follow.followedId).filter(Follow.followerId == user_id).all()
