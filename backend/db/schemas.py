@@ -5,6 +5,10 @@ from pydantic import BaseModel
 
 
 class UserSchema(BaseModel):
+    """
+    Schema for user data.
+    """
+
     id: int
     email: str
     Username: str
@@ -21,6 +25,10 @@ class UserSchema(BaseModel):
 
 
 class ReviewSchema(BaseModel):
+    """
+    Schema for review data.
+    """
+
     User: int
     stars: float
     ReviewText: str
@@ -32,12 +40,20 @@ class ReviewSchema(BaseModel):
 
 
 class ReviewCreate(BaseModel):
+    """
+    Schema for creating a review.
+    """
+
     stars: float
     ReviewText: str
     MediaId: int
 
 
 class ReviewResponse(BaseModel):
+    """
+    Schema for review response data.
+    """
+
     id: int
     User: int
     stars: float
@@ -50,6 +66,10 @@ class ReviewResponse(BaseModel):
 
 
 class ReviewByMediaResponse(BaseModel):
+    """
+    Schema for review response data by media.
+    """
+
     id: int
     stars: float
     ReviewText: str
@@ -64,6 +84,10 @@ class ReviewByMediaResponse(BaseModel):
 
 
 class UserCreate(BaseModel):
+    """
+    Schema for creating a user.
+    """
+
     Email: str
     Username: str
     Password: str
@@ -76,4 +100,8 @@ class UserCreate(BaseModel):
 
 
 class FollowCreate(BaseModel):
+    """
+    Schema for creating a follow relationship.
+    """
+
     idToFollow: int

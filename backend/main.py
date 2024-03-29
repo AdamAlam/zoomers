@@ -4,8 +4,7 @@ from typing import Optional
 import bcrypt
 import requests
 from core.config import settings
-from db.base_class import Base
-from db.models import Follow, Review, User
+from db.models import Follow, Review, User, Watched
 from db.schemas import (
     FollowCreate,
     ReviewByMediaResponse,
@@ -13,18 +12,12 @@ from db.schemas import (
     ReviewResponse,
     UserCreate,
 )
-from db.session import SessionLocal, engine
+from db.session import SessionLocal
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from util.auth import generate_jwt, validate_jwt
-
-
-def create_tables():
-    """Create database tables based on SQLAlchemy models."""
-    Base.metadata.create_all(bind=engine)
-
 
 origins = ["http://localhost:3000"]
 
@@ -53,7 +46,6 @@ def start_application() -> FastAPI:
         FastAPI: The configured FastAPI application.
     """
     app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
-    create_tables()
 
     app.add_middleware(
         CORSMiddleware,
@@ -125,7 +117,7 @@ async def get_show_detail(show_id: str):
 
 
 @app.get("/movies/popular/")
-async def get_popular_movies(page: Optional[str] = 1):
+async def get_popular_movies(page: Optional[str] = "1"):
     """
     Fetch and return a list of popular movies from an external API.
 
@@ -142,12 +134,11 @@ async def get_popular_movies(page: Optional[str] = 1):
     }
 
     response = requests.get(url, headers=headers, timeout=10)
-
     return response.json()
 
 
 @app.get("/tvShows/popular/")
-async def get_popular_shows(page: Optional[str] = 1):
+async def get_popular_shows(page: Optional[str] = "1"):
     """
     Fetch and return a list of popular TV shows from an external API.
 
@@ -158,6 +149,78 @@ async def get_popular_shows(page: Optional[str] = 1):
         dict: The list of popular TV shows as a JSON response.
     """
     url = f"https://api.themoviedb.org/3/tv/popular?language=en-US&page={page}"
+
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {settings.TMDB_BEARER}",
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
+
+    return response.json()
+
+
+@app.get("/search/movies/{query}")
+def search_movies(query: str, payload: dict = Depends(validate_jwt)):
+    """
+    Search for movie using the provided query.
+
+    Args:
+        query (str): The search query.
+        payload (dict): The payload containing the JWT token.
+
+    Returns:
+        dict: The JSON response containing the search results.
+    """
+    url = f"https://api.themoviedb.org/3/search/movie?query={query}&include_adult=false&language=en-US&page=1"
+
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {settings.TMDB_BEARER}",
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
+
+    return response.json()
+
+
+@app.get("/search/tv/{query}")
+def search_tv_shows(query: str, payload: dict = Depends(validate_jwt)):
+    """
+    Search for tv show using the provided query.
+
+    Args:
+        query (str): The search query.
+        payload (dict): The payload containing the JWT token.
+
+    Returns:
+        dict: The JSON response containing the search results.
+    """
+    url = f"https://api.themoviedb.org/3/search/tv?query={query}&include_adult=false&language=en-US&page=1"
+
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {settings.TMDB_BEARER}",
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
+
+    return response.json()
+
+
+@app.get("/search/all/{query}")
+def search_media(query: str, payload: dict = Depends(validate_jwt)):
+    """
+    Search for media using the provided query.
+
+    Args:
+        query (str): The search query.
+        payload (dict): The payload containing the JWT token.
+
+    Returns:
+        dict: The JSON response containing the search results.
+    """
+    url = f"https://api.themoviedb.org/3/search/multi?query={query}&include_adult=false&language=en-US&page=1"
 
     headers = {
         "accept": "application/json",
@@ -204,7 +267,7 @@ async def create_review(
     Raises:
         HTTPException: If the user ID is not found or if a review already exists for the user and media.
     """
-    # TODO: This chunch of code is repeated in multiple places. Refactor it into a function.
+    # TODO: This chunk of code is repeated in multiple places. Refactor it into a function.
     user_id = payload.get("user_id")
     if not user_id:
         raise HTTPException(
@@ -238,7 +301,7 @@ async def create_review(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        ) from e
     return new_review
 
 
@@ -262,7 +325,7 @@ async def get_reviews_by_media_id(media_id: int, db: Session = Depends(get_db)):
             Review.Date,
             Review.MediaId,
             User.DisplayName,
-            User.ProfilePictureUrl
+            User.ProfilePictureUrl,
         )
         .join(User, Review.User == User.id)
         .filter(Review.MediaId == media_id)
@@ -277,7 +340,7 @@ async def get_reviews_by_media_id(media_id: int, db: Session = Depends(get_db)):
             Date=review.Date,
             MediaId=review.MediaId,
             DisplayName=review.DisplayName,
-            ProfilePictureUrl=review.ProfilePictureUrl
+            ProfilePictureUrl=review.ProfilePictureUrl,
         )
         for review in db_response
     ]
@@ -330,7 +393,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        ) from e
     return new_user
 
 
@@ -478,7 +541,7 @@ def create_follow(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        ) from e
     return {"message": "Follow successful"}
 
 
@@ -523,6 +586,114 @@ def unfollow_user(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        ) from e
 
     return {"message": "Unfollow successful"}
+
+
+@app.post("/watched")
+def add_to_watched(
+    media_id: int,
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+):
+    """
+    Add a media item to the user's watched list.
+
+    Parameters:
+    - media_id (int): The ID of the media item to be added.
+    - payload (dict): The payload containing user information obtained from the JWT token.
+    - db (Session): The database session.
+
+    Returns:
+    - dict: A dictionary with a message indicating that the media item has been added to the watched list.
+
+    Raises:
+    - HTTPException: If the user ID is not found or if the media item is already in the watched list.
+    - HTTPException: If there is an internal server error during the database operation.
+    """
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+
+    existing_watched = (
+        db.query(Watched)
+        .filter(Watched.user_id == user_id, Watched.media_id == media_id)
+        .first()
+    )
+    if existing_watched:
+        raise HTTPException(
+            status_code=status.HTTP_400_NOT_FOUND,
+            detail="This item is already in your watched list.",
+        )
+
+    new_watch = Watched(
+        user_id=user_id,
+        media_id=media_id,
+        created_at=datetime.datetime.now(datetime.UTC),
+    )
+    db.add(new_watch)
+
+    try:
+        db.commit()
+        db.refresh(new_watch)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        ) from e
+
+    return {"message": "Media item added to watched list."}
+
+
+@app.delete("/watched")
+def remove_from_watched(
+    media_id: int,
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+):
+    """
+    Remove an item from the user's watched list.
+
+    Args:
+        media_id (int): The ID of the media item to be removed.
+        payload (dict): The payload containing user information obtained from the JWT.
+        db (Session): The database session.
+
+    Returns:
+        dict: A dictionary with a message indicating that the item has been removed from the watched list.
+
+    Raises:
+        HTTPException: If the user ID is not found or if the item is not found in the user's watched list.
+        HTTPException: If there is an error while deleting the item from the database.
+    """
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+
+    watched_item = (
+        db.query(Watched)
+        .filter(Watched.user_id == user_id, Watched.media_id == media_id)
+        .first()
+    )
+
+    if not watched_item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The user does not have this item in their watched list.",
+        )
+
+    try:
+        db.delete(watched_item)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        ) from e
+
+    return {"message": "Removed item from watched list"}
