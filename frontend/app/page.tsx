@@ -18,7 +18,7 @@ export default function Home() {
   useEffect(() => {
     // get's the user's 5 most recent reviews
     axios
-      .get('http://localhost:8000/myReviews?limit=5', {
+      .get('http://localhost:8000/myReviews?limit=6', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
         }
@@ -29,13 +29,15 @@ export default function Home() {
   return (
     <div>
       <MovieGrid movies={movieList} />
-      <h2 className="text-lg font-semibold">My Reviews</h2>
-      <div className="flex justify-between">
-        {reviewList.map(review => (
-          <div key={review.id}>
-            <ReviewCard review={review} />
-          </div>
-        ))}
+      <div className="container">
+        <h2 className="ml-8 text-lg font-semibold">My Recent Reviews</h2>
+        <div className="container flex justify-between">
+          {reviewList.map(review => (
+            <div key={review.id}>
+              <ReviewCard review={review} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
