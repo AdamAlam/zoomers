@@ -1,7 +1,8 @@
 'use client';
+
 import Image from 'next/image';
-import { Movie } from '../movie.types';
 import Link from 'next/link';
+import { Movie } from '../movie.types';
 
 interface Props {
   movies: Movie[];
@@ -12,21 +13,28 @@ const MovieGrid = ({ movies }: Props) => {
 
   return (
     <div className="ml-5">
-      <h1>Popular</h1>
+      <h1 className="text-3xl font-bold">Popular</h1>
       <div
         className="flex overflow-y-hidden overflow-x-scroll p-5"
         id="movie-row"
       >
         {movies.map((movie: Movie) => (
-          <Link href={`/movie/${movie.id}`} key={movie.id}>
-            <Image
-              src={`${imageBaseUrl}${movie.poster_path}`}
-              className="transform object-contain px-2 transition-transform hover:scale-110"
-              width={200}
-              height={300}
-              alt={movie.title} // Add this line
-            />
-          </Link>
+          <div
+            className="inline-flex flex-shrink-0 px-2"
+            key={movie.id}
+            style={{ width: 200, height: 300 }}
+          >
+            <Link href={`/movie/${movie.id}`}>
+              <Image
+                src={`${imageBaseUrl}${movie.poster_path}`}
+                className="transition-transform hover:scale-110"
+                layout="fixed"
+                width={200}
+                height={300}
+                alt={movie.title}
+              />
+            </Link>
+          </div>
         ))}
       </div>
     </div>

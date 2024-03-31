@@ -75,3 +75,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* TODO: I need to figure out where to put this */
+#movie-row::-webkit-scrollbar {
+  display: none;
+}
