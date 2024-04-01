@@ -1,5 +1,5 @@
 'use client';
-import ReviewStack from '@/app/components/ReviewStack';
+import Reviews from '@/app/components/Reviews';
 import { Review } from '@/app/review.types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,12 +10,11 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Rating } from 'react-simple-star-rating';
 import { Movie } from '../../movie.types';
-import Reviews from '@/app/components/Reviews';
+
 interface FormData {
   reviewText: string;
   stars: number;
   mediaId: string;
-  user: number;
 }
 
 const MovieDetail = ({ params }: { params: { movieId: string } }) => {
@@ -26,11 +25,12 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
   const [formData, setFormData] = useState<FormData>({
     reviewText: '',
     stars: 2.5,
-    mediaId: params.movieId,
-    user: 1
+    mediaId: params.movieId
   });
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -62,13 +62,19 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
   const handleReviewSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     axios
-      .post(`http://localhost:8000/reviews`, {
-        MediaId: params.movieId,
-        stars: formData.stars,
-        ReviewText: formData.reviewText || '',
-        // TODO: I am using a random user id from the DB just for review variety.
-        User: Math.floor(Math.random() * (327 - 128 + 1)) + 128
-      })
+      .post(
+        `http://localhost:8000/reviews`,
+        {
+          MediaId: params.movieId,
+          stars: formData.stars,
+          ReviewText: formData.reviewText || ''
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`
+          }
+        }
+      )
       .then(res => {
         if (res.status === 200) {
           toast({
