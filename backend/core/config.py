@@ -14,6 +14,7 @@ class Settings:
     DATABASE_URL = os.getenv("SUPABASE_URL")
     TMDB_BEARER = os.getenv("TMDB_BEARER")
     JWT_SECRET = os.getenv("JWT_SECRET")
+    OPEN_AI_KEY = os.getenv("OPEN_AI_KEY")
 
 
 settings = Settings()
