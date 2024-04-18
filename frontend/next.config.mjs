@@ -4,8 +4,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*', // Proxy all requests that go to /api/
-        destination: 'http://137.184.0.116:8080/:path*',
-        permanent: true
+        destination: 'http://137.184.0.116:8080/:path*'
       }
     ];
   },
