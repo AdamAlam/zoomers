@@ -15,11 +15,17 @@ from db.schemas import (
 from db.session import SessionLocal
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
+from openai import OpenAI
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from util.auth import generate_jwt, validate_jwt
 
 origins = ["http://localhost:3000"]
+
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key=settings.OPEN_AI_KEY,
+)
 
 
 def get_db():
@@ -778,3 +784,27 @@ def get_reviews_of_followed_users(
     ]
 
     return response
+
+
+@app.get("/queryAI/{query}")
+def query_ai(query: str, payload: dict = Depends(validate_jwt)):
+    """
+    Query the OpenAI GPT-3 API with the provided text.
+
+    Args:
+        query (str): The text to query the AI with.
+        payload (dict): The payload containing the JWT token.
+
+    Returns:
+        dict: The response from the OpenAI API.
+    """
+    chat_completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "user",
+                "content": query,
+            },
+        ],
+    )
+    return chat_completion.choices[0].message.content
