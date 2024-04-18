@@ -20,7 +20,8 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 from util.auth import generate_jwt, validate_jwt
 
-origins = ["http://localhost:3000"]
+# FIXME: This is just to test if app runs in initial deployment.
+origins = ["*"]
 
 client = OpenAI(
     # This is the default and can be omitted
