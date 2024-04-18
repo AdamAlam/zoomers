@@ -35,7 +35,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
 
   // TODO: Figure out what to do with this
   const updateReviews = () => {
-    fetch(`http://localhost:8000/reviews/${params.movieId}`)
+    fetch(`/api/reviews/${params.movieId}`)
       .then(res => res.json())
       .then(data => setReviews(data));
   };
@@ -43,7 +43,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
   // Get movie details
   useEffect(() => {
     if (params.movieId !== undefined) {
-      fetch(`http://localhost:8000/movie/${params.movieId}}`)
+      fetch(`/api/movie/${params.movieId}}`)
         .then(res => res.json())
         .then(data => setMovieDetails(data));
     }
@@ -52,7 +52,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
   // Get reviews for this movie
   useEffect(() => {
     if (params.movieId !== undefined) {
-      fetch(`http://localhost:8000/reviews/${params.movieId}`)
+      fetch(`/api/reviews/${params.movieId}`)
         .then(res => res.json())
         .then(data => setReviews(data));
     }
@@ -62,7 +62,7 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
     e.preventDefault();
     axios
       .post(
-        `http://localhost:8000/reviews`,
+        `/api/reviews`,
         {
           MediaId: params.movieId,
           stars: formData.stars,

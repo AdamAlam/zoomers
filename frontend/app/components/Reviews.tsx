@@ -19,7 +19,7 @@ export default function Reviews({ params }: { params: { movieId: string } }) {
   // Get reviews for movie id
   useEffect(() => {
     if (params.movieId !== undefined) {
-      fetch(`http://localhost:8000/reviews/${params.movieId}`)
+      fetch(`/api/reviews/${params.movieId}`)
         .then(res => res.json())
         .then(data => setReviews(data));
     }

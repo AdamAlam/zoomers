@@ -31,7 +31,7 @@ const Login = () => {
     const { email, password } = formData;
     axios
       .post(
-        'http://localhost:8000/login',
+        '/api/login',
         {},
         {
           headers: {
