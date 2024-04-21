@@ -96,23 +96,24 @@ const MovieDetail = ({ params }: { params: { movieId: string } }) => {
   };
 
   return movieDetails ? (
-    <div className="mx-auto max-w-screen-lg">
+    <div className="-my-20 mx-auto max-w-screen-lg">
       <div className="flex flex-col items-center justify-center">
-        <div className="relative mb-4 h-[450px] w-full">
+        <div className="relative -z-20 mb-4 h-[450px] w-full">
           <Image
             src={`${imageUrl}${movieDetails.backdrop_path}`}
             layout="fill"
             objectFit="cover"
             alt="Movie backdrop image"
           />
+          {/* TODO: Soften the gradient */}
           {/* Overlay for bottom fade */}
           <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
-
-          {/* Overlay for left side fade
+          {/* Overlay for top fade */}
+          <div className="absolute left-0 right-0 top-0 h-32 bg-gradient-to-b from-white to-transparent" />
+          {/* Overlay for left side fade */}
+          <div className="absolute bottom-0 left-0 top-0 w-60 bg-gradient-to-r from-white to-transparent" />
           {/* Overlay for right side fade */}
-          <div className="absolute bottom-0 left-0 top-0 w-80 bg-gradient-to-r from-white to-transparent" />
-
-          <div className="absolute bottom-0 right-0 top-0 w-80 bg-gradient-to-l from-white to-transparent" />
+          <div className="absolute bottom-0 right-0 top-0 w-60 bg-gradient-to-l from-white to-transparent" />
         </div>
         <div className="flex w-[95%] justify-start">
           <div className="mr-8 shrink-0">

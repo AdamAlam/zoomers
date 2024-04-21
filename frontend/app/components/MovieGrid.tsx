@@ -18,7 +18,10 @@ const MovieGrid = ({ movies }: Props) => {
       </h2>
 
       <div className="relative">
-        <div className="relative -mb-6 w-full overflow-x-auto py-6">
+        <div
+          className="relative -mb-6 w-full overflow-x-auto py-6"
+          id="movie-row"
+        >
           <ul
             role="list"
             className="mx-4 inline-flex space-x-2 sm:mx-6 lg:mx-0"
