@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import Navigation from '@/app/components/Navigation';
 
+import { useState } from 'react';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -16,10 +17,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Navigation />
+        <Navigation isAuthenticated={isAuthenticated} />
         <main>
           <div className="px-4 sm:px-6 lg:px-8">{children}</div>
         </main>
