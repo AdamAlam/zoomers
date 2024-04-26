@@ -19,10 +19,6 @@ interface Props {
   mobile?: boolean;
 }
 
-interface NavigationItemProps {
-  isAuthenticated: boolean;
-}
-
 const navigationItems = [{ name: 'Home', href: '/' }];
 
 const NavigationItem = ({ item, mobile = false }: Props) => {
@@ -96,24 +92,20 @@ export default function Navigation({ isAuthenticated }: NavigationItemProps) {
             <NavigationItem key={item.name} item={item} />
           ))}
         </div>
-        {isAuthenticated ? (
-          <div>Hello</div>
-        ) : (
-          <div className="flex flex-1 items-center justify-end gap-x-6">
-            <Link
-              href="/logIn"
-              className="hidden lg:block lg:text-sm lg:font-semibold lg:leading-6 lg:text-gray-900"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/signUp"
-              className="rounded-md bg-gradient-to-br from-black to-neutral-600 px-3 py-2 text-sm font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-            >
-              Sign up
-            </Link>
-          </div>
-        )}
+        <div className="flex flex-1 items-center justify-end gap-x-6">
+          <Link
+            href="/logIn"
+            className="hidden lg:block lg:text-sm lg:font-semibold lg:leading-6 lg:text-gray-900"
+          >
+            Log in
+          </Link>
+          <Link
+            href="/signUp"
+            className="rounded-md bg-gradient-to-br from-black to-neutral-600 px-3 py-2 text-sm font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+          >
+            Sign up
+          </Link>
+        </div>
 
         <div className="flex lg:hidden">
           <button
