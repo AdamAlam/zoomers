@@ -36,7 +36,7 @@ const Login = () => {
     if (isAuthenticated) {
       router.push('/');
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, router]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

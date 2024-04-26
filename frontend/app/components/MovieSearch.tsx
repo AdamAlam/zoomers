@@ -9,7 +9,7 @@ function MovieSearch({}: Props) {
   const [search, setSearch] = useState('');
   const router = useRouter();
 
-  const handleSubmit = e => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     router.push(`/search/${encodeURI(search)}`);
   };
