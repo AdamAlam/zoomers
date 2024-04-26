@@ -6,15 +6,16 @@ import { Movie } from '../movie.types';
 
 interface Props {
   movies: Movie[];
+  header?: string;
 }
 
-const MovieGrid = ({ movies }: Props) => {
+const MovieGrid = ({ movies, header = 'Popular' }: Props) => {
   const imageBaseUrl = 'https://image.tmdb.org/t/p/original';
 
   return (
     <div className="py-6 sm:py-12 lg:mx-auto lg:max-w-7xl lg:px-8">
       <h2 className="text-2xl font-bold tracking-tight text-gray-900">
-        Popular
+        {header}
       </h2>
 
       <div className="relative">

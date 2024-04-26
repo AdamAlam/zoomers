@@ -143,7 +143,7 @@ async def get_show_detail(show_id: str):
     return response.json()
 
 
-@app.get("/movies/popular/")
+@app.get("/movies/popular")
 async def get_popular_movies(page: Optional[str] = "1"):
     """
     Fetch and return a list of popular movies from an external API.
@@ -164,7 +164,7 @@ async def get_popular_movies(page: Optional[str] = "1"):
     return response.json()
 
 
-@app.get("/tvShows/popular/")
+@app.get("/tvShows/popular")
 async def get_popular_shows(page: Optional[str] = "1"):
     """
     Fetch and return a list of popular TV shows from an external API.
@@ -259,7 +259,7 @@ def search_media(query: str, payload: dict = Depends(validate_jwt)):
     return response.json()
 
 
-@app.get("/allReviews/")
+@app.get("/allReviews")
 async def get_all_reviews(db: Session = Depends(get_db)):
     """
     Retrieve all reviews from the database.
@@ -274,7 +274,7 @@ async def get_all_reviews(db: Session = Depends(get_db)):
     return db_response
 
 
-@app.post("/reviews/", response_model=ReviewResponse)
+@app.post("/reviews", response_model=ReviewResponse)
 async def create_review(
     review_data: ReviewCreate,
     payload: dict = Depends(validate_jwt),
@@ -370,7 +370,7 @@ async def get_reviews_by_media_id(media_id: int, db: Session = Depends(get_db)):
     return result
 
 
-@app.post("/signup/")
+@app.post("/signup")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     """
     Create a new user in the database.
@@ -419,7 +419,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
-@app.post("/login/")
+@app.post("/login")
 def login_user(
     email: str = Header(None),
     password: str = Header(None),
@@ -536,7 +536,7 @@ def get_my_reviews(
     return response
 
 
-@app.post("/follow/", status_code=status.HTTP_201_CREATED)
+@app.post("/follow", status_code=status.HTTP_201_CREATED)
 def create_follow(
     follow: FollowCreate,
     payload: dict = Depends(validate_jwt),
@@ -587,7 +587,7 @@ def create_follow(
     return {"message": "Follow successful"}
 
 
-@app.delete("/unfollow/", status_code=status.HTTP_200_OK)
+@app.delete("/unfollow", status_code=status.HTTP_200_OK)
 def unfollow_user(
     followedId: int,
     payload: dict = Depends(validate_jwt),

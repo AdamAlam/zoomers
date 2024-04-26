@@ -20,7 +20,7 @@ const ReviewCard = ({ review }: Props) => {
   // TODO: Need to get media info (title, image, etc.) in review
   const [movieData, setMovieData] = useState<Movie>();
   useEffect(() => {
-    axios.get(`http://localhost:8000/movie/${review.MediaId}`).then(res => {
+    axios.get(`/api/movie/${review.MediaId}`).then(res => {
       setMovieData(res.data);
     });
   }, [review]);
