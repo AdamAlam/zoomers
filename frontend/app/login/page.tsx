@@ -7,7 +7,7 @@ import {
 } from '@tabler/icons-react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { cn } from '../utils/cn';
@@ -30,6 +30,14 @@ const Login = () => {
   const { isAuthenticated, login } = useAuth();
 
   const [loginError, setLoginError] = useState<boolean>(false);
+
+  // Redirect user if they are already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated]);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { email, password } = formData;
