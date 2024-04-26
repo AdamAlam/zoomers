@@ -12,6 +12,8 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { cn } from '../utils/cn';
 
+import { useAuth } from '../AuthProvider';
+
 interface formDataType {
   email: string;
   password: string;
@@ -24,6 +26,8 @@ const Login = () => {
     email: '',
     password: ''
   });
+
+  const { isAuthenticated, login } = useAuth();
 
   const [loginError, setLoginError] = useState<boolean>(false);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -43,6 +47,7 @@ const Login = () => {
       .then(res => {
         if (res.status === 200) {
           localStorage.setItem('authToken', res.data.jwt);
+          login();
           toast({
             title: 'Login Success',
             description:

@@ -2,9 +2,8 @@ import Navigation from '@/app/components/Navigation';
 import { Toaster } from '@/components/ui/toaster';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { AuthProvider } from './AuthProvider';
 import './globals.css';
-
-import { useState } from 'react';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -20,13 +19,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-6xl">
-            <Navigation />
-            <main>{children}</main>
-            <Toaster />
+        <AuthProvider>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-6xl">
+              <Navigation />
+              <main>{children}</main>
+              <Toaster />
+            </div>
           </div>
-        </div>
+        </AuthProvider>
       </body>
     </html>
   );
