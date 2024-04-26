@@ -21,8 +21,12 @@ function SearchResults({ params }: { params: { searchQuery: string } }) {
   }, [params.searchQuery]);
   return (
     <div>
-      <h1>{decodeURI(params.searchQuery)}</h1>
-      {searchResults && <MovieGrid movies={searchResults} />}
+      {searchResults && (
+        <MovieGrid
+          movies={searchResults}
+          header={`Search results for '${decodeURI(params.searchQuery)}'`}
+        />
+      )}
     </div>
   );
 }
