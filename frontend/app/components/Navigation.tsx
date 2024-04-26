@@ -74,7 +74,7 @@ export default function Navigation({ isAuthenticated }: NavigationItemProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white">
+    <header>
       <nav
         className="mx-auto flex max-w-7xl items-center justify-between gap-x-6 p-6 lg:px-8"
         aria-label="Global"
@@ -94,7 +94,7 @@ export default function Navigation({ isAuthenticated }: NavigationItemProps) {
         </div>
         <div className="flex flex-1 items-center justify-end gap-x-6">
           <Link
-            href="/logIn"
+            href="/login"
             className="hidden lg:block lg:text-sm lg:font-semibold lg:leading-6 lg:text-gray-900"
           >
             Log in

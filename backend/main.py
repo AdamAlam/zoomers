@@ -13,13 +13,19 @@ from db.schemas import (
     UserCreate,
 )
 from db.session import SessionLocal
-from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
+from openai import OpenAI
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from util.auth import generate_jwt, validate_jwt
 
 origins = ["http://localhost:3000"]
+
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key=settings.OPEN_AI_KEY,
+)
 
 
 def get_db():
@@ -59,6 +65,27 @@ def start_application() -> FastAPI:
 
 
 app = start_application()
+
+
+def get_user_id(payload):
+    """
+    Retrieves the user ID from the payload.
+
+    Args:
+        payload (dict): The payload containing the user ID.
+
+    Returns:
+        str: The user ID.
+
+    Raises:
+        HTTPException: If the user ID is not found in the payload.
+    """
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
+        )
+    return user_id
 
 
 @app.get("/")
@@ -267,12 +294,7 @@ async def create_review(
     Raises:
         HTTPException: If the user ID is not found or if a review already exists for the user and media.
     """
-    # TODO: This chunk of code is repeated in multiple places. Refactor it into a function.
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
+    user_id = get_user_id(payload)
 
     existing_review = (
         db.query(Review)
@@ -291,7 +313,7 @@ async def create_review(
         stars=review_data.stars,
         ReviewText=review_data.ReviewText,
         MediaId=review_data.MediaId,
-        Date=datetime.datetime.now(datetime.timezone.utc),
+        Date=datetime.datetime.now(datetime.UTC),
     )
     db.add(new_review)
     try:
@@ -468,7 +490,11 @@ def get_average_rating(media_id: int, db: Session = Depends(get_db)):
 # It requires a valid JWT as an auth header to access it.
 @app.get("/myReviews", response_model=list[ReviewResponse])
 def get_my_reviews(
-    payload: dict = Depends(validate_jwt), db: Session = Depends(get_db)
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+    limit: int = Query(
+        default=None, description="Limit the number of reviews returned."
+    ),
 ):
     """
     Get all the reviews by the user.
@@ -476,18 +502,38 @@ def get_my_reviews(
     Returns:
         list: A list of all reviews by the user.
     """
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
-    reviews = db.query(Review).filter(Review.User == user_id).all()
+    user_id = get_user_id(payload)
+    query = (
+        db.query(Review, User.DisplayName, User.ProfilePictureUrl)
+        .join(User, Review.User == User.id)
+        .filter(Review.User == user_id)
+        .order_by(Review.Date.desc())
+    )
+
+    if limit:
+        query = query.limit(limit)
+
+    reviews = query.all()
+
     if not reviews:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="No reviews found."
         )
+    response = [
+        {
+            "id": review.id,
+            "User": review.User,
+            "stars": review.stars,
+            "ReviewText": review.ReviewText,
+            "Date": review.Date,
+            "MediaId": review.MediaId,
+            "DisplayName": display_name,
+            "ProfilePictureUrl": profile_picture_url,
+        }
+        for review, display_name, profile_picture_url in reviews
+    ]
 
-    return reviews
+    return response
 
 
 @app.post("/follow/", status_code=status.HTTP_201_CREATED)
@@ -511,11 +557,7 @@ def create_follow(
         HTTPException: If the user ID is not found or if the user is already being followed.
         HTTPException: If there is an internal server error during the database operation.
     """
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
+    user_id = get_user_id(payload)
 
     existing_follow = (
         db.query(Follow)
@@ -561,11 +603,7 @@ def unfollow_user(
     Returns:
         dict: An object with a message indicating the unfollow was successful.
     """
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
+    user_id = get_user_id(payload)
 
     follow_relationship = (
         db.query(Follow)
@@ -612,11 +650,7 @@ def add_to_watched(
     - HTTPException: If the user ID is not found or if the media item is already in the watched list.
     - HTTPException: If there is an internal server error during the database operation.
     """
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
+    user_id = get_user_id(payload)
 
     existing_watched = (
         db.query(Watched)
@@ -669,11 +703,7 @@ def remove_from_watched(
         HTTPException: If the user ID is not found or if the item is not found in the user's watched list.
         HTTPException: If there is an error while deleting the item from the database.
     """
-    user_id = payload.get("user_id")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User ID not found."
-        )
+    user_id = get_user_id(payload)
 
     watched_item = (
         db.query(Watched)
@@ -697,3 +727,84 @@ def remove_from_watched(
         ) from e
 
     return {"message": "Removed item from watched list"}
+
+
+@app.get("/following-reviews", response_model=list[ReviewResponse])
+def get_reviews_of_followed_users(
+    payload: dict = Depends(validate_jwt),
+    db: Session = Depends(get_db),
+    limit: int = Query(default=10, description="Limit the number of reviews returned."),
+):
+    """
+    Get reviews of users that the current user follows.
+
+    Args:
+        payload (dict): The payload containing the user ID.
+        db (Session): The database session.
+        limit (int, optional): Limit the number of reviews returned.
+
+    Returns:
+        list: A list of reviews by users that the current user follows.
+    """
+    user_id = get_user_id(payload)
+
+    followed_users = (
+        db.query(Follow.followedId).filter(Follow.followerId == user_id).all()
+    )
+
+    followed_user_ids = [user_id for user_id, in followed_users]
+
+    query = (
+        db.query(Review, User.DisplayName, User.ProfilePictureUrl)
+        .join(User, Review.User == User.id)
+        .filter(Review.User.in_(followed_user_ids))
+        .order_by(Review.Date.desc())
+        .limit(max(limit, 20))
+    )
+
+    reviews = query.all()
+
+    if not reviews:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No reviews found."
+        )
+
+    response = [
+        {
+            "id": review.id,
+            "User": review.User,
+            "stars": review.stars,
+            "ReviewText": review.ReviewText,
+            "Date": review.Date,
+            "MediaId": review.MediaId,
+            "DisplayName": display_name,
+            "ProfilePictureUrl": profile_picture_url,
+        }
+        for review, display_name, profile_picture_url in reviews
+    ]
+
+    return response
+
+
+@app.get("/queryAI/{query}")
+def query_ai(query: str, payload: dict = Depends(validate_jwt)):
+    """
+    Query the OpenAI GPT-3 API with the provided text.
+
+    Args:
+        query (str): The text to query the AI with.
+        payload (dict): The payload containing the JWT token.
+
+    Returns:
+        dict: The response from the OpenAI API.
+    """
+    chat_completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "user",
+                "content": query,
+            },
+        ],
+    )
+    return chat_completion.choices[0].message.content

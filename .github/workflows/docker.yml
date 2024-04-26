@@ -31,3 +31,8 @@ jobs:
             SUPABASE_URL=${{ secrets.SUPABASE_URL }}
             TMDB_BEARER=${{ secrets.TMDB_BEARER }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
+            OPEN_AI_KEY=${{ secrets.OPEN_AI_KEY }}
+          platforms: |
+            linux/amd64
+            linux/arm64
+            
