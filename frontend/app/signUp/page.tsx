@@ -55,7 +55,7 @@ const SignUp = () => {
     try {
       signupFormSchema.parse(formValues);
       axios
-        .post('http://localhost:8000/signup', {
+        .post('/api/signup', {
           FirstName: formValues.firstname,
           LastName: formValues.lastname,
           Email: formValues.email,

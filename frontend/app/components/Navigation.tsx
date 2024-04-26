@@ -12,6 +12,7 @@ import { useAuth } from '../AuthProvider';
 
 import { Bars3Icon, FilmIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import MovieSearch from './MovieSearch';
 
 interface Props {
   item: {
@@ -111,7 +112,7 @@ export default function Navigation() {
             </Link>
           </div>
         ) : (
-          <div>Search Bar Here</div>
+          <MovieSearch />
         )}
 
         <div className="flex lg:hidden">

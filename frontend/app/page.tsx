@@ -10,7 +10,7 @@ export default function Home() {
   const [movieList, setMovieList] = useState([]);
   const [reviewList, setReviewsList] = useState<Review[]>([]);
   useEffect(() => {
-    fetch('http://localhost:8000/movies/popular')
+    fetch('/api/movies/popular')
       .then(res => res.json())
       .then(data => setMovieList(data.results));
   }, []);
@@ -18,7 +18,7 @@ export default function Home() {
   useEffect(() => {
     // get's the user's 5 most recent reviews
     axios
-      .get('http://localhost:8000/myReviews?limit=6', {
+      .get('/api/myReviews?limit=6', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
         }

@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*', // Proxy all requests that go to /api/
+        destination: 'http://localhost:8000/:path*'
+      }
+    ];
+  },
   images: {
     remotePatterns: [
       {
